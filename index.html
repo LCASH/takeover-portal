@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Takeover Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="screen">
+    <!-- Eye + Join: center of page -->
+    <div class="center-block">
+      <div class="eye-wrap" id="eyeWrap">
+        <div class="eye" id="eye">
+          <div class="eye-lid"></div>
+          <div class="eye-iris"></div>
+          <div class="eye-pupil"></div>
+        </div>
+      </div>
+      <button type="button" class="join-btn" id="joinBtn" hidden>Join</button>
+    </div>
+
+    <!-- Form (hidden until Join clicked) -->
+    <div class="form-wrap" id="formWrap" hidden>
+      <form class="portal-form" id="portalForm">
+        <label>
+          <span>Full name</span>
+          <input type="text" name="fullname" required autocomplete="name" />
+        </label>
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" />
+        </label>
+        <label>
+          <span>Mobile</span>
+          <input type="tel" name="mobile" required autocomplete="tel" />
+        </label>
+        <label>
+          <span>Country</span>
+          <input type="text" name="country" id="countryInput" list="country-list" required placeholder="Type to search..." autocomplete="off" />
+          <datalist id="country-list"></datalist>
+        </label>
+        <label>
+          <span>Referrer</span>
+          <input type="text" name="referrer" autocomplete="off" />
+        </label>
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>
+
+    <!-- Post-submit message -->
+    <div class="confirm-msg" id="confirmMsg" hidden>
+      We will reach out instantly to confirm your identity.
+    </div>
+  </div>
+
+  <!-- Glitch overlay -->
+  <div class="glitch-overlay" id="glitchOverlay" hidden></div>
+
+  <!-- Blackout -->
+  <div class="blackout" id="blackout" hidden></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="countries.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

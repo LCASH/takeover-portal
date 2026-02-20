@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .portal-page { min-height: 100vh; padding: 1.5rem; max-width: 560px; margin: 0 auto; }
+    .portal-page h1 { font-size: 1.1rem; color: #d3d7cf; margin-bottom: 1rem; }
+    .portal-page .disclaimer { background: #1a1a1a; border: 1px solid #2d2d2d; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: #d3d7cf; line-height: 1.5; }
+    .portal-page .portal-form label { display: block; margin-bottom: 1rem; }
+    .portal-page .portal-form label span { display: block; font-size: 0.75rem; color: #729fcf; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+    .portal-page .portal-form input[type="text"],
+    .portal-page .portal-form input[type="email"],
+    .portal-page .portal-form input[type="tel"],
+    .portal-page .portal-form input[type="date"],
+    .portal-page .portal-form textarea { width: 100%; font-family: inherit; padding: 0.5rem 0.6rem; background: #111; border: 1px solid #2d2d2d; color: #d3d7cf; border-radius: 2px; }
+    .portal-page .portal-form textarea { min-height: 100px; resize: vertical; }
+    .portal-page .upload-zone { border: 2px dashed #2d2d2d; padding: 1.5rem; text-align: center; color: #555; cursor: pointer; border-radius: 4px; margin-top: 0.25rem; }
+    .portal-page .upload-zone:hover, .portal-page .upload-zone.dragover { border-color: #8ae234; color: #8ae234; }
+    .portal-page .upload-zone.has-file { border-color: #8ae234; color: #8ae234; }
+    .portal-page .portal-form .checkbox-label { display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer; font-size: 0.9rem; color: #d3d7cf; }
+    .portal-page .portal-form .checkbox-label input { width: auto; margin: 0.2rem 0 0 0; }
+    .portal-page .banks-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.25rem; }
+    .portal-page .banks-list label { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; color: #d3d7cf; cursor: pointer; margin-bottom: 0; }
+    .portal-page .thanks-msg { text-align: center; padding: 2rem 0; color: #d3d7cf; line-height: 1.7; }
+    .portal-page .confirmed-msg { color: #8ae234; margin-top: 1rem; }
+    .portal-page .form-error-msg { color: #ef2929; font-size: 0.8rem; margin-bottom: 0.5rem; }
+    .portal-page .sign-out { margin-top: 2rem; }
+    .portal-page .sign-out a { color: #729fcf; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="portal-page">
+    <div id="loadingEl">Loading…</div>
+    <div id="accessDeniedEl" hidden>
+      <p>You do not have access to the portal. <a href="login.html">Sign in</a></p>
+    </div>
+    <div id="onboardingEl" hidden>
+      <h1>Complete your details</h1>
+      <p class="disclaimer">Submitting this information does not mean you automatically receive the money and ongoing payment. We need to confirm your details are legitimate and usable first. Don't submit if you don't want to.</p>
+      <p id="formError" class="form-error-msg" hidden></p>
+      <form id="onboardingForm" class="portal-form">
+        <label>
+          <span>Date of birth *</span>
+          <input type="date" name="date_of_birth" required />
+        </label>
+        <label>
+          <span>Address *</span>
+          <input type="text" name="address" required placeholder="Full address" />
+        </label>
+        <label>
+          <span>Referrer *</span>
+          <input type="text" name="referrer" required />
+        </label>
+        <label>
+          <span>All previous betting accounts you have signed up to (Tab, Sportsbet, Bet 365, etc.) *</span>
+          <textarea name="previous_betting_accounts" required placeholder="List any existing betting accounts..."></textarea>
+        </label>
+        <label>
+          <span>Select one or multiple banks that you consent to us managing on your behalf *</span>
+          <p style="font-size:0.8rem;color:#729fcf;margin-bottom:0.5rem;">Choosing one of the banks below + ING may qualify you to make an extra $125 on sign up.</p>
+          <div class="banks-list" id="banksList"></div>
+        </label>
+        <label>
+          <span>Selfie ID (to verify the individual is signing up to this form for themselves) *</span>
+          <div class="upload-zone" id="selfieZone" data-name="selfie">Drop files here or browse</div>
+          <input type="file" id="selfieInput" accept="image/*,.pdf" style="display:none" />
+        </label>
+        <label>
+          <span>Front of license *</span>
+          <div class="upload-zone" id="licenseFrontZone" data-name="license_front">Drop files here or browse</div>
+          <input type="file" id="licenseFrontInput" accept="image/*,.pdf" style="display:none" />
+        </label>
+        <label>
+          <span>Back of license *</span>
+          <div class="upload-zone" id="licenseBackZone" data-name="license_back">Drop files here or browse</div>
+          <input type="file" id="licenseBackInput" accept="image/*,.pdf" style="display:none" />
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" name="accept_betting_tcs" required />
+          <span>Accepting Betting accounts T&Cs *</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" name="accept_bank_paypal_tcs" required />
+          <span>Accepting Bank and Paypal T&Cs *</span>
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" name="confirm_details" required />
+          <span>Confirming the details you entered are yours *</span>
+        </label>
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>
+    <div id="thanksEl" hidden>
+      <div class="thanks-msg">
+        <p>Thanks! The team will reach out to you asap to confirm your details give you your $100 and ongoing $25.</p>
+        <p id="confirmedLine" class="confirmed-msg" hidden>You're confirmed. We'll be in touch.</p>
+      </div>
+      <div class="sign-out"><a href="#" id="signOutLink">Sign out</a></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="banks.js"></script>
+  <script src="portal.js"></script>
+</body>
+</html>

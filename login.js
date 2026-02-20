@@ -1,0 +1,65 @@
+(function () {
+  const config = window.PORTAL_CONFIG || {};
+  const supabaseUrl = (config.supabaseUrl || '').replace(/\/$/, '');
+  const supabaseAnonKey = config.supabaseAnonKey || '';
+  if (!supabaseUrl || !supabaseAnonKey) {
+    document.getElementById('loginError').textContent = 'Portal is not configured.';
+    document.getElementById('loginError').hidden = false;
+    return;
+  }
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+  const form = document.getElementById('loginForm');
+  const errorEl = document.getElementById('loginError');
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.hidden = false;
+  }
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    errorEl.hidden = true;
+    var email = form.querySelector('[name="email"]').value.trim();
+    var password = form.querySelector('[name="password"]').value;
+
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Signing in…'; }
+
+    try {
+      var { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError) {
+        showError(authError.message || 'Sign in failed.');
+        if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
+        return;
+      }
+      var userId = authData.user?.id;
+      if (!userId) {
+        showError('Sign in failed.');
+        if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
+        return;
+      }
+      var { data: bowler, error: bowlerError } = await supabase
+        .from('bowlers')
+        .select('id, login_enabled_at')
+        .eq('auth_user_id', userId)
+        .maybeSingle();
+      if (bowlerError) {
+        await supabase.auth.signOut();
+        showError('Could not verify your account.');
+        if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
+        return;
+      }
+      if (!bowler || !bowler.login_enabled_at) {
+        await supabase.auth.signOut();
+        showError('Your account is not yet enabled for portal access. We will reach out when you can log in.');
+        if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
+        return;
+      }
+      window.location.href = 'portal.html';
+    } catch (err) {
+      showError(err.message || 'Something went wrong.');
+      if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
+    }
+  });
+})();

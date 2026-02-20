@@ -10,6 +10,7 @@ build/
 .env
 .env.*
 !.env.example
+config.js
 
 # OS
 .DS_Store
