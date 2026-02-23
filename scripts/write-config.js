@@ -44,5 +44,19 @@ window.PORTAL_CONFIG = {
 };
 `;
 
+// On Vercel, fail the build if env is missing so you don't deploy a broken "not configured" site
+if (process.env.VERCEL === '1' && (!url || !key)) {
+  console.error('');
+  console.error('*** BUILD FAILED: Portal needs env vars on Vercel ***');
+  console.error('Go to: Vercel → this project (takeover-portal) → Settings → Environment Variables');
+  console.error('Add for Production (and Preview):');
+  console.error('  SUPABASE_URL     = https://YOUR_PROJECT.supabase.co');
+  console.error('  SUPABASE_ANON_KEY = your anon key from Supabase → Project Settings → API');
+  console.error('  PORTAL_ORGANIZATION_ID = your org UUID (optional)');
+  console.error('Then redeploy.');
+  console.error('');
+  process.exit(1);
+}
+
 fs.writeFileSync(path.join(dir, 'config.build.js'), out, 'utf8');
 console.log('[portal build] Wrote config.build.js – configured:', !!(url && key));
