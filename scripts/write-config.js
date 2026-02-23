@@ -26,9 +26,14 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-const url = process.env.SUPABASE_URL || '';
-const key = process.env.SUPABASE_ANON_KEY || '';
-const orgId = process.env.PORTAL_ORGANIZATION_ID || '';
+const url = (process.env.SUPABASE_URL || '').trim();
+const key = (process.env.SUPABASE_ANON_KEY || '').trim();
+const orgId = (process.env.PORTAL_ORGANIZATION_ID || '').trim();
+
+// Log so you can see in Vercel build logs whether env was picked up
+console.log('[portal build] SUPABASE_URL:', url ? url.slice(0, 40) + '...' : '(not set)');
+console.log('[portal build] SUPABASE_ANON_KEY:', key ? 'set (' + key.length + ' chars)' : '(not set)');
+console.log('[portal build] PORTAL_ORGANIZATION_ID:', orgId || '(not set)');
 
 const out = `// Generated at build time from env (SUPABASE_*, PORTAL_ORGANIZATION_ID)
 window.PORTAL_CONFIG = {
@@ -39,4 +44,4 @@ window.PORTAL_CONFIG = {
 `;
 
 fs.writeFileSync(path.join(dir, 'config.build.js'), out, 'utf8');
-console.log('Wrote config.build.js (supabaseUrl:', url ? url.slice(0, 30) + '...' : 'not set', ')');
+console.log('[portal build] Wrote config.build.js – configured:', !!(url && key));

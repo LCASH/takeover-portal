@@ -56,3 +56,25 @@ Do these once so the portal works on Vercel (no “Portal is not configured”, 
 - [ ] (Optional) Supabase Site URL and Redirect URLs set for the portal domain
 
 After that, open the portal URL → **Login** → enter a bowler’s email/password (one you enabled via “Generate password” in TAKEOVER) → sign in should succeed.
+
+---
+
+## Still seeing “Portal is not configured”?
+
+1. **Exact variable names** (case-sensitive):
+   - `SUPABASE_URL` (not Supabase_URL or SUPABASE_URLS)
+   - `SUPABASE_ANON_KEY` (not ANON_KEY or SUPABASE_ANON)
+   - `PORTAL_ORGANIZATION_ID` (optional for login; needed for signup flow)
+
+2. **Production vs Preview**  
+   In **Settings → Environment Variables**, each variable has checkboxes for **Production**, **Preview**, **Development**. If you open the portal from the main production URL, the vars must be checked for **Production**. Add them for **Production** (and **Preview** if you use branch deploys), then **Redeploy**.
+
+3. **Check the build logs**  
+   In Vercel → **Deployments** → click the latest deployment → **Building** (or **Logs**). You should see lines like:
+   - `[portal build] SUPABASE_URL: https://...` (or `(not set)`)
+   - `[portal build] SUPABASE_ANON_KEY: set (XXX chars)` (or `(not set)`)
+   - `[portal build] Wrote config.build.js – configured: true`  
+   If you see `(not set)` for URL or key, the build didn’t get the env. Fix the names/scope above and redeploy.
+
+4. **Redeploy after changing env**  
+   Changing env vars does **not** auto-redeploy. Go to **Deployments** → **⋮** on latest → **Redeploy** (or push a new commit).
