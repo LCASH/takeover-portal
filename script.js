@@ -33,6 +33,16 @@
       })
     : null;
 
+  // Show banner only on localhost when config is missing/placeholder (never in production)
+  var configBanner = document.getElementById('configBanner');
+  var isLocalhost = typeof location !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+  var looksPlaceholder = !supabaseUrl || !supabaseAnonKey ||
+    /your-project|x\.supabase\.co/.test(supabaseUrl) ||
+    /your-anon-key|^anon$/.test((supabaseAnonKey || '').trim());
+  if (configBanner && isLocalhost && looksPlaceholder) {
+    configBanner.hidden = false;
+  }
+
   // Populate searchable country datalist
   if (window.PORTAL_COUNTRIES) {
     const list = document.getElementById('country-list');

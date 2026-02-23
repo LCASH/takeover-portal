@@ -9,6 +9,29 @@ body {
   position: relative;
 }
 
+/* --- Config banner (dev / unconfigured) --- */
+.config-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 0.6rem 1rem;
+  font-size: 0.75rem;
+  background: #1a1a1e;
+  border-bottom: 1px solid #2a2a2e;
+  color: #729fcf;
+}
+.config-banner code {
+  background: #0a0a0b;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+.config-banner[hidden] {
+  display: none;
+}
+
 /* --- Screen container --- */
 .screen {
   min-height: 100vh;

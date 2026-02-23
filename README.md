@@ -22,6 +22,15 @@ Use relative paths; the same files work at `/` or `/portal`. Deploy this folder 
 
 Configure your static host so the app is served from the path you want.
 
+## Production deployment (Vercel)
+
+1. **Connect repo** to Vercel; build command is `npm run build`, output directory is `.`.
+2. **Environment variables** (Project → Settings → Environment Variables): set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PORTAL_ORGANIZATION_ID` for Production (and Preview if needed). The build writes these into `config.js`; never commit `config.js` or `.env`.
+3. **Supabase dashboard** (before going live):
+   - **Auth → URL configuration**: set **Site URL** to your portal URL (e.g. `https://your-portal.vercel.app`) and **Redirect URLs** to `https://your-portal.vercel.app/**`.
+   - **Settings → API → CORS**: allow only your portal origin(s) so the anon key cannot be used from other domains.
+4. **Security checklist**: see [docs/SECURITY.md](docs/SECURITY.md) for HTTPS, rate limiting, and optional CAPTCHA.
+
 ## Supabase (portal project)
 
 1. Create a project at [supabase.com](https://supabase.com).
