@@ -4,7 +4,8 @@
   "framework": null,
   "rewrites": [
     { "source": "/portal", "destination": "/portal.html" },
-    { "source": "/login", "destination": "/login.html" }
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/account", "destination": "/account.html" }
   ],
   "headers": [
     {

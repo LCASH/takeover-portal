@@ -15,10 +15,43 @@
   const thanksEl = document.getElementById('thanksEl');
   const onboardingForm = document.getElementById('onboardingForm');
   const formError = document.getElementById('formError');
+  const statusLabel = document.getElementById('statusLabel');
+  const statusSubtext = document.getElementById('statusSubtext');
   const confirmedLine = document.getElementById('confirmedLine');
   const signOutLink = document.getElementById('signOutLink');
+  const discordLink = document.getElementById('discordLink');
+  const discordCard = document.getElementById('discordCard');
 
   let bowler = null;
+
+  function statusCopy(status) {
+    if (status === 'confirmed') return { label: 'Approved', subtext: "You're all set. We'll be in touch with next steps." };
+    if (status === 'unqualified') return { label: 'Not approved', subtext: 'Your application was not approved. Contact us if you have questions.' };
+    return { label: 'Pending review', subtext: "We're checking your details. We'll be in touch within 24 hours." };
+  }
+
+  function showDashboard(b) {
+    if (!thanksEl) return;
+    bowler = b;
+    var status = (b && b.status) ? b.status : 'onboarding_submitted';
+    var copy = statusCopy(status);
+    var statusCard = document.getElementById('statusCard');
+    if (statusCard) {
+      statusCard.classList.remove('status-approved', 'status-not-approved');
+      if (status === 'confirmed') statusCard.classList.add('status-approved');
+      else if (status === 'unqualified') statusCard.classList.add('status-not-approved');
+    }
+    if (statusLabel) statusLabel.textContent = copy.label;
+    if (statusSubtext) statusSubtext.textContent = copy.subtext;
+    if (confirmedLine) {
+      confirmedLine.hidden = status !== 'confirmed';
+      confirmedLine.classList.toggle('hidden', status !== 'confirmed');
+    }
+    var discordUrl = (window.PORTAL_CONFIG && window.PORTAL_CONFIG.discordInviteUrl) || '';
+    if (discordLink) discordLink.href = discordUrl || '#';
+    if (discordCard) discordCard.style.display = discordUrl ? '' : 'none';
+    thanksEl.hidden = false;
+  }
 
   function showError(msg) {
     formError.textContent = msg;
@@ -28,16 +61,24 @@
     formError.hidden = true;
   }
 
+  function setUploadZoneText(zone, text) {
+    var textEl = zone.querySelector('.upload-text');
+    if (textEl) textEl.textContent = text;
+    else zone.textContent = text;
+  }
+
   function setupBanks() {
     const list = document.getElementById('banksList');
     if (!list || !window.PORTAL_BANKS) return;
     list.innerHTML = '';
     window.PORTAL_BANKS.forEach(function (bank) {
       var label = document.createElement('label');
+      label.className = 'bank-card flex items-center p-3 rounded-lg gap-3 hover:bg-[#23272c]';
       var input = document.createElement('input');
       input.type = 'checkbox';
       input.name = 'banks_consent';
       input.value = bank;
+      input.addEventListener('change', function () { label.classList.toggle('selected', input.checked); });
       label.appendChild(input);
       label.appendChild(document.createTextNode(bank));
       list.appendChild(label);
@@ -48,8 +89,14 @@
     var zone = document.getElementById(idZone);
     var input = document.getElementById(idInput);
     if (!zone || !input) return;
+    var defaultText = zone.getAttribute('data-placeholder') || 'Drop files here or browse';
     function highlight() { zone.classList.add('dragover'); }
     function unhighlight() { zone.classList.remove('dragover'); }
+    function updateLabel() {
+      var name = input.files[0] && input.files[0].name;
+      setUploadZoneText(zone, name ? '\u2713 ' + name : defaultText);
+      zone.classList.toggle('has-file', !!name);
+    }
     zone.addEventListener('click', function () { input.click(); });
     zone.addEventListener('dragover', function (e) { e.preventDefault(); highlight(); });
     zone.addEventListener('dragleave', unhighlight);
@@ -57,13 +104,9 @@
       e.preventDefault();
       unhighlight();
       if (e.dataTransfer.files.length) input.files = e.dataTransfer.files;
-      zone.textContent = (input.files[0] && input.files[0].name) || 'Drop files here or browse';
-      zone.classList.add('has-file');
+      updateLabel();
     });
-    input.addEventListener('change', function () {
-      zone.textContent = (input.files[0] && input.files[0].name) || 'Drop files here or browse';
-      zone.classList.toggle('has-file', !!(input.files && input.files[0]));
-    });
+    input.addEventListener('change', updateLabel);
   }
 
   function onboardingComplete(b) {
@@ -104,8 +147,10 @@
 
     loadingEl.hidden = true;
     if (onboardingComplete(bowler)) {
-      thanksEl.hidden = false;
-      if (bowler.status === 'confirmed') confirmedLine.hidden = false;
+      // Refetch so status is up to date when they return to the portal
+      var { data: fresh } = await supabase.from('bowlers').select('*').eq('id', bowler.id).single();
+      if (fresh) bowler = fresh;
+      showDashboard(bowler);
     } else {
       onboardingEl.hidden = false;
       if (bowler.date_of_birth) onboardingForm.querySelector('[name="date_of_birth"]').value = bowler.date_of_birth;
@@ -115,7 +160,11 @@
       if (bowler.banks_consent && bowler.banks_consent.length) {
         bowler.banks_consent.forEach(function (bank) {
           var cb = onboardingForm.querySelector('input[name="banks_consent"][value="' + bank + '"]');
-          if (cb) cb.checked = true;
+          if (cb) {
+            cb.checked = true;
+            var label = cb.closest('label');
+            if (label) label.classList.add('selected');
+          }
         });
       }
     }
@@ -189,8 +238,10 @@
         .eq('id', bowler.id);
       if (updateErr) throw updateErr;
 
+      bowler.status = 'onboarding_submitted';
+      bowler.required_form_completed_at = now;
       onboardingEl.hidden = true;
-      thanksEl.hidden = false;
+      showDashboard(bowler);
     } catch (err) {
       showError(err.message || 'Submission failed. Try again.');
       if (btn) { btn.disabled = false; btn.textContent = 'Submit'; }

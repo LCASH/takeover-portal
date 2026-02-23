@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account – Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root { --bg-dark: #0f1113; --surface: #1a1d21; --accent: #5dbbff; --success: #7cfc00; }
+    body { background-color: var(--bg-dark); color: white; font-family: 'Inter', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .input-field {
+      background-color: var(--surface); border: 1px solid #2d3139;
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      border-color: var(--accent); outline: none;
+      box-shadow: 0 0 0 2px rgba(93, 187, 255, 0.2);
+    }
+    .submit-btn {
+      background-color: var(--success); color: #000; font-weight: 700;
+      transition: transform 0.1s;
+    }
+    .submit-btn:hover { filter: brightness(1.1); }
+    .submit-btn:active { transform: scale(0.98); }
+    .btn-secondary {
+      background: var(--surface); border: 1px solid #2d3139; color: #9ca3af;
+    }
+    .btn-secondary:hover { border-color: #4b5563; color: white; }
+  </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen">
+  <div class="max-w-2xl mx-auto">
+    <div id="loadingEl" class="text-gray-400 mono">Loading…</div>
+    <div id="accessDeniedEl" hidden class="text-gray-300">
+      <p>You do not have access. <a href="login.html" class="text-[#5dbbff] hover:underline">Sign in</a></p>
+    </div>
+    <div id="accountEl" hidden>
+      <header class="mb-8 flex items-center justify-between">
+        <a href="portal.html" class="text-sm text-gray-500 hover:text-[#5dbbff] transition-colors mono flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Back to portal
+        </a>
+        <h1 class="text-xl font-bold mono tracking-tight text-[#5dbbff] uppercase">Account</h1>
+        <a href="#" id="signOutLink" class="text-sm text-gray-500 hover:text-[#5dbbff] transition-colors mono">Sign out</a>
+      </header>
+
+      <p id="formMessage" class="text-sm mb-4 hidden"></p>
+
+      <!-- Edit details -->
+      <section class="mb-10">
+        <h2 class="text-sm font-bold mono uppercase tracking-widest text-[#5dbbff] mb-4">Edit your details</h2>
+        <form id="detailsForm" class="space-y-4">
+          <div>
+            <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">Date of birth</label>
+            <input type="date" name="date_of_birth" class="w-full input-field rounded px-4 py-3 text-white" />
+          </div>
+          <div>
+            <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">Address</label>
+            <input type="text" name="address" placeholder="Full address" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600" />
+          </div>
+          <div>
+            <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">Referrer</label>
+            <input type="text" name="referrer" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600" />
+          </div>
+          <div>
+            <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">Previous betting accounts</label>
+            <textarea name="previous_betting_accounts" placeholder="List any existing betting accounts..." rows="3" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600 resize-none"></textarea>
+          </div>
+          <button type="submit" class="submit-btn px-6 py-3 rounded-lg mono uppercase tracking-wider text-sm">Save changes</button>
+        </form>
+      </section>
+
+      <!-- Request to end partnership -->
+      <section class="pt-8 border-t border-[#2d3139]">
+        <h2 class="text-sm font-bold mono uppercase tracking-widest text-[#5dbbff] mb-2">End partnership</h2>
+        <p class="text-sm text-gray-400 mb-4">If you want to stop working with us, submit a request below. We'll process it and get back to you.</p>
+        <form id="endPartnershipForm" class="space-y-4">
+          <div>
+            <label class="block mono text-xs font-bold uppercase text-gray-500 mb-2 tracking-widest">Reason (optional)</label>
+            <textarea name="reason" placeholder="Tell us why you're leaving..." rows="3" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600 resize-none"></textarea>
+          </div>
+          <button type="submit" class="px-6 py-3 rounded-lg mono uppercase tracking-wider text-sm btn-secondary border">Request to end partnership</button>
+        </form>
+        <p id="endPartnershipDone" class="text-sm text-[#7cfc00] mt-3 hidden">We've received your request. We'll be in touch.</p>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.build.js"></script>
+  <script src="account.js"></script>
+</body>
+</html>

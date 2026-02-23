@@ -1,6 +1,8 @@
-// Generated at build time from env (SUPABASE_*, PORTAL_ORGANIZATION_ID)
+// Overwritten by "npm run build" from .env (local) or Vercel Environment Variables.
+// Do not commit real keys. Placeholder only.
 window.PORTAL_CONFIG = {
-  supabaseUrl: "https://mqikfwwbrrqkcrwrsfyg.supabase.co",
-  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xaWtmd3dicnJxa2Nyd3JzZnlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzOTgxMjUsImV4cCI6MjA4NTk3NDEyNX0.kMOs49xw72Vy_SUHcHzMqU1j2YqcHqVU7mRnlUu109U",
-  organizationId: "ee059661-dfe0-4f81-8c4f-70338fb6b4e8"
+  supabaseUrl: '',
+  supabaseAnonKey: '',
+  organizationId: null,
+  discordInviteUrl: null
 };
