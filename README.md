@@ -4,7 +4,9 @@ Separate domain/app for bowlers: AI landing page → signup as **lead** → you 
 
 **Live:** [https://your-portal.vercel.app/](https://your-portal.vercel.app/) (landing · [login](https://your-portal.vercel.app/login.html) · [portal](https://your-portal.vercel.app/portal.html) after login)
 
-**Security:** No secrets in the repo. `config.build.js` is a placeholder; the build fills it from **.env** (local, gitignored) or **Vercel Environment Variables**. Run `npm run build` once – it creates `.env` from `.env.example` if missing; add your values there (or in Vercel), then build again. If you see **"Portal is not configured"**: add `SUPABASE_URL` and `SUPABASE_ANON_KEY` to `.env` or Vercel env, then redeploy.
+**Security:** No secrets in the repo. `config.build.js` is a placeholder; the build fills it from **.env** (local, gitignored) or **Vercel Environment Variables**. Run `npm run build` once – it creates `.env` from `.env.example` if missing; add your values there (or in Vercel), then build again.
+
+**→ Clear steps for Vercel:** [docs/VERCEL_STEPS.md](docs/VERCEL_STEPS.md)
 
 ## Flow
 
