@@ -7,8 +7,17 @@
 const fs = require('fs');
 const path = require('path');
 
+const dir = path.join(__dirname, '..');
+const envPath = path.join(dir, '.env');
+const envExamplePath = path.join(dir, '.env.example');
+
+// Create .env from .env.example if missing (so you can fill in values; .env is gitignored)
+if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
+  fs.copyFileSync(envExamplePath, envPath);
+  console.log('Created .env from .env.example – add your SUPABASE_URL, SUPABASE_ANON_KEY, PORTAL_ORGANIZATION_ID');
+}
+
 // Load .env from project root if present (local dev)
-const envPath = path.join(__dirname, '..', '.env');
 if (fs.existsSync(envPath)) {
   const env = fs.readFileSync(envPath, 'utf8');
   env.split(/\r?\n/).forEach(function (line) {
@@ -29,6 +38,5 @@ window.PORTAL_CONFIG = {
 };
 `;
 
-const dir = path.join(__dirname, '..');
 fs.writeFileSync(path.join(dir, 'config.build.js'), out, 'utf8');
 console.log('Wrote config.build.js (supabaseUrl:', url ? url.slice(0, 30) + '...' : 'not set', ')');

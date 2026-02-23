@@ -4,7 +4,7 @@ Separate domain/app for bowlers: AI landing page → signup as **lead** → you 
 
 **Live:** [https://your-portal.vercel.app/](https://your-portal.vercel.app/) (landing · [login](https://your-portal.vercel.app/login.html) · [portal](https://your-portal.vercel.app/portal.html) after login)
 
-If you see **"Portal is not configured"** on login: set **SUPABASE_URL** and **SUPABASE_ANON_KEY** in Vercel (Project → Settings → Environment Variables), then **redeploy** so the build can write `config.js`.
+**Security:** No secrets in the repo. `config.build.js` is a placeholder; the build fills it from **.env** (local, gitignored) or **Vercel Environment Variables**. Run `npm run build` once – it creates `.env` from `.env.example` if missing; add your values there (or in Vercel), then build again. If you see **"Portal is not configured"**: add `SUPABASE_URL` and `SUPABASE_ANON_KEY` to `.env` or Vercel env, then redeploy.
 
 ## Flow
 
@@ -27,7 +27,7 @@ Configure your static host so the app is served from the path you want.
 ## Production deployment (Vercel)
 
 1. **Connect repo** to Vercel; build command is `npm run build`, output directory is `.`.
-2. **Environment variables** (Project → Settings → Environment Variables): set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PORTAL_ORGANIZATION_ID` for Production (and Preview if needed). The build writes these into `config.js`; never commit `config.js` or `.env`.
+2. **Environment variables** (Project → Settings → Environment Variables): set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PORTAL_ORGANIZATION_ID` for Production (and Preview if needed). The build writes these into `config.build.js`; never commit `.env` or real keys.
 3. **Supabase dashboard** (before going live):
    - **Auth → URL configuration**: set **Site URL** to your portal URL (e.g. `https://your-portal.vercel.app`) and **Redirect URLs** to `https://your-portal.vercel.app/**`.
    - **Settings → API → CORS**: allow only your portal origin(s) so the anon key cannot be used from other domains.
