@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Writes config.js from environment variables (for Vercel/build).
+ * Writes config.build.js from environment variables (for Vercel/build).
+ * We use config.build.js (not config.js) so it can be committed as placeholder and is never gitignored – Vercel then includes it in the deployment after the build overwrites it.
  * For local dev: copy .env.example to .env and set SUPABASE_URL, SUPABASE_ANON_KEY, PORTAL_ORGANIZATION_ID, then run npm run build.
  */
 const fs = require('fs');
@@ -29,5 +30,5 @@ window.PORTAL_CONFIG = {
 `;
 
 const dir = path.join(__dirname, '..');
-fs.writeFileSync(path.join(dir, 'config.js'), out, 'utf8');
-console.log('Wrote config.js (supabaseUrl:', url ? url.slice(0, 30) + '...' : 'not set', ')');
+fs.writeFileSync(path.join(dir, 'config.build.js'), out, 'utf8');
+console.log('Wrote config.build.js (supabaseUrl:', url ? url.slice(0, 30) + '...' : 'not set', ')');
