@@ -7,6 +7,7 @@
     return;
   }
   const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+  const BUCKET = 'portal-documents';
 
   const loadingEl = document.getElementById('loadingEl');
   const accessDeniedEl = document.getElementById('accessDeniedEl');
@@ -25,6 +26,74 @@
   }
   function hideMessage() {
     formMessage.hidden = true;
+  }
+
+  function renderDocState() {
+    if (!bowler) return;
+    setDocRow('selfieCurrent', 'selfieZone', bowler.selfie_url);
+    setDocRow('licenseFrontCurrent', 'licenseFrontZone', bowler.license_front_url);
+    setDocRow('licenseBackCurrent', 'licenseBackZone', bowler.license_back_url);
+  }
+  function setDocRow(currentId, zoneId, path) {
+    var currentEl = document.getElementById(currentId);
+    var zone = document.getElementById(zoneId);
+    if (currentEl) currentEl.textContent = path ? 'Current: ' + path.split('/').pop() : '';
+    if (zone) {
+      zone.textContent = path ? 'Replace file' : 'Click to upload or replace';
+      zone.classList.toggle('has-file', !!path);
+    }
+  }
+
+  function setupDocUpload(zoneId, inputId, removeId, currentId, column) {
+    var zone = document.getElementById(zoneId);
+    var input = document.getElementById(inputId);
+    var removeBtn = document.getElementById(removeId);
+    if (!zone || !input || !removeBtn) return;
+    zone.addEventListener('click', function () { input.click(); });
+    input.addEventListener('change', function () {
+      if (!input.files || !input.files[0] || !bowler) return;
+      var file = input.files[0];
+      var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      var path = bowler.id + '/' + (zone.getAttribute('data-suffix') || column) + '.' + ext;
+      zone.textContent = 'Uploading…';
+      supabase.storage.from(BUCKET).upload(path, file, { upsert: true }).then(function (r) {
+        if (r.error) {
+          showMessage(r.error.message || 'Upload failed.', true);
+          renderDocState();
+          return;
+        }
+        var payload = {};
+        payload[column] = path;
+        payload.updated_at = new Date().toISOString();
+        supabase.from('bowlers').update(payload).eq('id', bowler.id).then(function (u) {
+          if (u.error) {
+            showMessage(u.error.message || 'Update failed.', true);
+          } else {
+            bowler[column] = path;
+            showMessage('Document updated.');
+          }
+          renderDocState();
+          input.value = '';
+        });
+      });
+    });
+    removeBtn.addEventListener('click', function () {
+      if (!bowler) return;
+      var payload = {};
+      payload[column] = null;
+      payload.updated_at = new Date().toISOString();
+      removeBtn.disabled = true;
+      supabase.from('bowlers').update(payload).eq('id', bowler.id).then(function (u) {
+        removeBtn.disabled = false;
+        if (u.error) {
+          showMessage(u.error.message || 'Remove failed.', true);
+        } else {
+          bowler[column] = null;
+          showMessage('Document removed.');
+        }
+        renderDocState();
+      });
+    });
   }
 
   async function init() {
@@ -69,6 +138,12 @@
       endPartnershipForm.querySelector('button[type="submit"]').disabled = true;
       endPartnershipForm.querySelector('textarea').disabled = true;
     }
+
+    // Documents: show current state and wire upload/remove
+    renderDocState();
+    setupDocUpload('selfieZone', 'selfieInput', 'selfieRemove', 'selfieCurrent', 'selfie_url');
+    setupDocUpload('licenseFrontZone', 'licenseFrontInput', 'licenseFrontRemove', 'licenseFrontCurrent', 'license_front_url');
+    setupDocUpload('licenseBackZone', 'licenseBackInput', 'licenseBackRemove', 'licenseBackCurrent', 'license_back_url');
 
     // Sign out
     document.getElementById('signOutLink').addEventListener('click', async function (e) {

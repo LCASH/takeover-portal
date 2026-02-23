@@ -205,6 +205,7 @@
     var prefix = bowler.id + '/';
 
     try {
+      // Upload to Supabase Storage; store object path in DB. Full image URL = {supabaseUrl}/storage/v1/object/public/portal-documents/{path}
       var upload = async function (file, pathSuffix) {
         var path = prefix + pathSuffix + '.' + ext(file);
         var { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true });

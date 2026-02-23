@@ -31,6 +31,14 @@
       background: var(--surface); border: 1px solid #2d3139; color: #9ca3af;
     }
     .btn-secondary:hover { border-color: #4b5563; color: white; }
+    .upload-zone {
+      border: 2px dashed #2d3139; background: rgba(26, 29, 33, 0.5); cursor: pointer; transition: all 0.2s;
+    }
+    .upload-zone:hover { border-color: var(--accent); }
+    .upload-zone.has-file { border-color: #7cfc00; color: #86efac; }
+    .doc-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .doc-row .upload-zone { flex: 1; min-width: 140px; padding: 0.75rem; text-align: center; border-radius: 8px; font-size: 0.8rem; }
+    .doc-row .btn-remove { font-size: 0.75rem; padding: 0.35rem 0.6rem; }
   </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen">
@@ -73,6 +81,35 @@
           </div>
           <button type="submit" class="submit-btn px-6 py-3 rounded-lg mono uppercase tracking-wider text-sm">Save changes</button>
         </form>
+      </section>
+
+      <!-- Documents: re-upload or remove -->
+      <section class="mb-10 pt-8 border-t border-[#2d3139]">
+        <h2 class="text-sm font-bold mono uppercase tracking-widest text-[#5dbbff] mb-4">Your ID documents</h2>
+        <p class="text-sm text-gray-400 mb-4">Replace or remove your selfie and license uploads. Changes save immediately.</p>
+        <div class="space-y-4">
+          <div class="doc-row">
+            <span class="text-xs font-bold text-gray-400 uppercase w-28 shrink-0">Selfie</span>
+            <div class="upload-zone" id="selfieZone" data-suffix="selfie">Click to upload or replace</div>
+            <input type="file" id="selfieInput" accept="image/*,.pdf" class="hidden" />
+            <button type="button" id="selfieRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
+            <span id="selfieCurrent" class="text-xs text-gray-500"></span>
+          </div>
+          <div class="doc-row">
+            <span class="text-xs font-bold text-gray-400 uppercase w-28 shrink-0">License front</span>
+            <div class="upload-zone" id="licenseFrontZone" data-suffix="license_front">Click to upload or replace</div>
+            <input type="file" id="licenseFrontInput" accept="image/*,.pdf" class="hidden" />
+            <button type="button" id="licenseFrontRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
+            <span id="licenseFrontCurrent" class="text-xs text-gray-500"></span>
+          </div>
+          <div class="doc-row">
+            <span class="text-xs font-bold text-gray-400 uppercase w-28 shrink-0">License back</span>
+            <div class="upload-zone" id="licenseBackZone" data-suffix="license_back">Click to upload or replace</div>
+            <input type="file" id="licenseBackInput" accept="image/*,.pdf" class="hidden" />
+            <button type="button" id="licenseBackRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
+            <span id="licenseBackCurrent" class="text-xs text-gray-500"></span>
+          </div>
+        </div>
       </section>
 
       <!-- Request to end partnership -->
