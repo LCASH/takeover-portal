@@ -153,6 +153,10 @@
     if (bowler.address) detailsForm.querySelector('[name="address"]').value = bowler.address;
     if (bowler.referrer) detailsForm.querySelector('[name="referrer"]').value = bowler.referrer;
     if (bowler.previous_betting_accounts) detailsForm.querySelector('[name="previous_betting_accounts"]').value = bowler.previous_betting_accounts;
+    if (bowler.bank_account_name) detailsForm.querySelector('[name="bank_account_name"]').value = bowler.bank_account_name;
+    if (bowler.bank_bsb) detailsForm.querySelector('[name="bank_bsb"]').value = bowler.bank_bsb;
+    if (bowler.bank_account_number) detailsForm.querySelector('[name="bank_account_number"]').value = bowler.bank_account_number;
+    if (bowler.bank_pay_id) detailsForm.querySelector('[name="bank_pay_id"]').value = bowler.bank_pay_id;
 
     // If they already requested to end partnership, show message and disable form
     if (bowler.end_partnership_requested_at) {
@@ -186,6 +190,10 @@
       address: detailsForm.querySelector('[name="address"]').value || null,
       referrer: detailsForm.querySelector('[name="referrer"]').value || null,
       previous_betting_accounts: detailsForm.querySelector('[name="previous_betting_accounts"]').value || null,
+      bank_account_name: detailsForm.querySelector('[name="bank_account_name"]').value || null,
+      bank_bsb: detailsForm.querySelector('[name="bank_bsb"]').value || null,
+      bank_account_number: detailsForm.querySelector('[name="bank_account_number"]').value || null,
+      bank_pay_id: detailsForm.querySelector('[name="bank_pay_id"]').value || null,
       updated_at: new Date().toISOString(),
     };
     var { error } = await supabase.from('bowlers').update(payload).eq('id', bowler.id);

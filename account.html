@@ -82,6 +82,27 @@
             <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">Previous betting accounts</label>
             <textarea name="previous_betting_accounts" placeholder="List any existing betting accounts..." rows="3" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600 resize-none"></textarea>
           </div>
+
+          <h3 class="text-sm font-bold mono uppercase tracking-widest text-[#5dbbff] pt-4">Bank details</h3>
+          <div>
+            <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">Account name</label>
+            <input type="text" name="bank_account_name" placeholder="e.g. John Smith" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600" />
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">BSB</label>
+              <input type="text" name="bank_bsb" placeholder="e.g. 062-000" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600" />
+            </div>
+            <div>
+              <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">Account number</label>
+              <input type="text" name="bank_account_number" placeholder="e.g. 12345678" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600" />
+            </div>
+          </div>
+          <div>
+            <label class="block mono text-xs font-bold uppercase text-[#5dbbff] mb-2 tracking-widest">PayID (optional)</label>
+            <input type="text" name="bank_pay_id" placeholder="e.g. phone number or email" class="w-full input-field rounded px-4 py-3 text-white placeholder-gray-600" />
+          </div>
+
           <button type="submit" class="submit-btn px-6 py-3 rounded-lg mono uppercase tracking-wider text-sm">Save changes</button>
         </form>
       </section>

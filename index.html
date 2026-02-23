@@ -42,7 +42,13 @@
           </label>
           <label>
             <span>Mobile</span>
-            <input type="tel" name="mobile" required autocomplete="tel" placeholder="Include country code" />
+            <span class="mobile-row">
+              <select name="mobile_country" required aria-label="Country code" title="Country code">
+                <!-- Populated by script from PORTAL_PHONE_COUNTRY_CODES -->
+              </select>
+              <input type="tel" name="mobile_number" required autocomplete="tel-national" placeholder="e.g. 403432913" inputmode="numeric" pattern="[0-9\s\-]+" title="Enter number without country code (no leading +)" />
+            </span>
+            <small class="mobile-hint">Choose country code, then enter your number without the leading 0</small>
           </label>
           <label>
             <span>Country</span>

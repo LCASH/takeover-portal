@@ -196,6 +196,10 @@
     var address = onboardingForm.querySelector('[name="address"]').value || null;
     var referrer = onboardingForm.querySelector('[name="referrer"]').value || null;
     var previousBettingAccounts = onboardingForm.querySelector('[name="previous_betting_accounts"]').value || null;
+    var bankAccountName = onboardingForm.querySelector('[name="bank_account_name"]').value || null;
+    var bankBsb = onboardingForm.querySelector('[name="bank_bsb"]').value || null;
+    var bankAccountNumber = onboardingForm.querySelector('[name="bank_account_number"]').value || null;
+    var bankPayId = onboardingForm.querySelector('[name="bank_pay_id"]').value || null;
     var banksChecked = [];
     onboardingForm.querySelectorAll('input[name="banks_consent"]:checked').forEach(function (cb) {
       banksChecked.push(cb.value);
@@ -226,6 +230,10 @@
           referrer: referrer,
           previous_betting_accounts: previousBettingAccounts,
           banks_consent: banksChecked,
+          bank_account_name: bankAccountName,
+          bank_bsb: bankBsb,
+          bank_account_number: bankAccountNumber,
+          bank_pay_id: bankPayId,
           selfie_url: selfiePath,
           license_front_url: licenseFrontPath,
           license_back_url: licenseBackPath,
@@ -234,10 +242,29 @@
           confirm_details_entered_at: now,
           required_form_completed_at: now,
           status: 'onboarding_submitted',
+          onboarding_stage: 'form_submitted',
           updated_at: now,
         })
         .eq('id', bowler.id);
       if (updateErr) throw updateErr;
+
+      // Trigger form-submission reassurance SMS (Edge Function sends SMS and inserts into Inbox)
+      var config = window.PORTAL_CONFIG || {};
+      var supabaseUrl = (config.supabaseUrl || '').replace(/\/$/, '');
+      var session = (await supabase.auth.getSession()).data.session;
+      if (session && supabaseUrl) {
+        try {
+          await fetch(supabaseUrl + '/functions/v1/portal-submit-required-form', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + session.access_token,
+              'apikey': (config.supabaseAnonKey || '').trim()
+            },
+            body: JSON.stringify({})
+          });
+        } catch (_) { /* non-blocking; SMS best-effort */ }
+      }
 
       bowler.status = 'onboarding_submitted';
       bowler.required_form_completed_at = now;

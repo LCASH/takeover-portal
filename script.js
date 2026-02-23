@@ -55,6 +55,19 @@
     }
   }
 
+  // Populate mobile country code dropdown (E.164)
+  if (window.PORTAL_PHONE_COUNTRY_CODES) {
+    var sel = portalForm.querySelector('[name="mobile_country"]');
+    if (sel) {
+      window.PORTAL_PHONE_COUNTRY_CODES.forEach(function (x) {
+        var opt = document.createElement('option');
+        opt.value = x.code;
+        opt.textContent = x.label;
+        sel.appendChild(opt);
+      });
+    }
+  }
+
   function blink() {
     eyeEl.classList.add('blink');
     setTimeout(function () {
@@ -126,7 +139,17 @@
 
     var fullName = (portalForm.querySelector('[name="fullname"]') || {}).value || '';
     var email = (portalForm.querySelector('[name="email"]') || {}).value || '';
-    var mobile = (portalForm.querySelector('[name="mobile"]') || {}).value || '';
+    var countryCode = (portalForm.querySelector('[name="mobile_country"]') || {}).value || '';
+    var mobileNumber = (portalForm.querySelector('[name="mobile_number"]') || {}).value || '';
+    // Normalise to E.164: +<countryCode><digits>. Strip leading 0 from national number (e.g. 0403432913 -> 403432913 for AU).
+    var digits = (mobileNumber || '').replace(/\D/g, '');
+    if (digits.charAt(0) === '0') digits = digits.replace(/^0+/, '');
+    var mobile = (countryCode && digits) ? '+' + countryCode.replace(/\D/g, '') + digits : '';
+    if (!mobile) {
+      showFormError('Please choose a country code and enter your mobile number.');
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit'; }
+      return;
+    }
     var referrer = (portalForm.querySelector('[name="referrer"]') || {}).value || null;
     var country = (portalForm.querySelector('[name="country"]') || {}).value || '';
     var firstName = firstFromFullName(fullName);

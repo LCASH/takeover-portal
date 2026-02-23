@@ -242,6 +242,24 @@ body {
   border-radius: 8px;
   cursor: pointer;
 }
+.mobile-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.mobile-row select {
+  width: 10rem;
+  flex-shrink: 0;
+}
+.mobile-row input {
+  flex: 1;
+  min-width: 0;
+}
+.mobile-hint {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-top: -0.1rem;
+}
 .portal-form select:focus {
   outline: none;
   border-color: #8ae234;
