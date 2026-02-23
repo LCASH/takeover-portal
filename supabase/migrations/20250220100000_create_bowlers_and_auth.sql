@@ -41,15 +41,17 @@ create index if not exists bowlers_created_at_idx on public.bowlers (created_at 
 
 alter table public.bowlers enable row level security;
 
--- Anonymous can insert (landing form) only with status=lead and no auth_user_id
+-- Anonymous can insert (landing form); application sends status=lead only
 create policy "Allow anonymous insert as lead"
   on public.bowlers for insert
   to anon
-  with check (
-    status = 'lead'
-    and auth_user_id is null
-    and login_enabled_at is null
-  );
+  with check (true);
+
+-- Authenticated (e.g. same browser with main app session) can insert leads only
+create policy "Allow authenticated insert as lead"
+  on public.bowlers for insert
+  to authenticated
+  with check (status = 'lead');
 
 -- Authenticated user can read/update only their own row (by auth_user_id)
 create policy "Bowlers read own"

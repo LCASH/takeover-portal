@@ -25,30 +25,34 @@
 
     <!-- Form (hidden until Join clicked) -->
     <div class="form-wrap" id="formWrap" hidden>
-      <form class="portal-form" id="portalForm">
-        <label>
-          <span>Full name</span>
-          <input type="text" name="fullname" required autocomplete="name" />
-        </label>
-        <label>
-          <span>Email</span>
-          <input type="email" name="email" required autocomplete="email" />
-        </label>
-        <label>
-          <span>Mobile</span>
-          <input type="tel" name="mobile" required autocomplete="tel" />
-        </label>
-        <label>
-          <span>Country</span>
-          <input type="text" name="country" id="countryInput" list="country-list" required placeholder="Type to search..." autocomplete="off" />
-          <datalist id="country-list"></datalist>
-        </label>
-        <label>
-          <span>Referrer</span>
-          <input type="text" name="referrer" autocomplete="off" />
-        </label>
-        <button type="submit" class="submit-btn">Submit</button>
-      </form>
+      <div class="form-card">
+        <p class="form-reassurance">Your details are kept secure and only used to get in touch.</p>
+        <p id="formError" class="form-error-msg" hidden aria-live="polite"></p>
+        <form class="portal-form" id="portalForm">
+          <label>
+            <span>Full name</span>
+            <input type="text" name="fullname" required autocomplete="name" placeholder="As on your ID" />
+          </label>
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" />
+          </label>
+          <label>
+            <span>Mobile</span>
+            <input type="tel" name="mobile" required autocomplete="tel" placeholder="Include country code" />
+          </label>
+          <label>
+            <span>Country</span>
+            <input type="text" name="country" id="countryInput" list="country-list" required placeholder="Type to search..." autocomplete="off" />
+            <datalist id="country-list"></datalist>
+          </label>
+          <label>
+            <span>Referrer <em>(optional)</em></span>
+            <input type="text" name="referrer" autocomplete="off" placeholder="Who referred you?" />
+          </label>
+          <button type="submit" class="submit-btn">Submit</button>
+        </form>
+      </div>
     </div>
 
     <!-- Post-submit message -->

@@ -1,0 +1,8 @@
+{
+  "name": "takeover-portal",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/write-config.js",
+    "serve": "npx serve -l 8080"
+  }
+}

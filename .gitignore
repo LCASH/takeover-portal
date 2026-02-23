@@ -10,8 +10,8 @@ build/
 .env
 .env.*
 !.env.example
+# config.js generated at build from env (SUPABASE_URL, SUPABASE_ANON_KEY, PORTAL_ORGANIZATION_ID)
 config.js
-
 # OS
 .DS_Store
 Thumbs.db

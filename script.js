@@ -1,4 +1,6 @@
 (function () {
+  // Flow: Join → form → submit → RPC insert_portal_lead → send-portal-sms (welcome SMS using org Twilio) → confirm → glitch → blackout.
+  // Once login is enabled for them, they sign in at login.html and complete onboarding at portal.html.
   const eyeEl = document.getElementById('eye');
   const joinBtn = document.getElementById('joinBtn');
   const formWrap = document.getElementById('formWrap');
@@ -10,12 +12,25 @@
 
   let blinkCount = 0;
 
-  // Supabase: optional, from config
+  // Supabase: same project as main app; config.js has supabaseUrl + supabaseAnonKey.
+  // Force anon role: no session storage so we never send a JWT (avoids RLS "authenticated" path).
   const config = window.PORTAL_CONFIG || {};
   const supabaseUrl = (config.supabaseUrl || '').replace(/\/$/, '');
   const supabaseAnonKey = config.supabaseAnonKey || '';
+  const noStorage = {
+    getItem: function () { return null; },
+    setItem: function () {},
+    removeItem: function () {},
+  };
   const supabase = supabaseUrl && supabaseAnonKey
-    ? window.supabase.createClient(supabaseUrl, supabaseAnonKey)
+    ? window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+          storage: noStorage,
+        },
+      })
     : null;
 
   // Populate searchable country datalist
@@ -61,35 +76,15 @@
 
   function showFormError(msg) {
     var el = document.getElementById('formError');
-    if (!el) {
-      el = document.createElement('p');
-      el.id = 'formError';
-      el.className = 'form-error-msg';
-      portalForm.insertBefore(el, portalForm.firstChild);
+    if (el) {
+      el.textContent = msg;
+      el.hidden = false;
     }
-    el.textContent = msg;
-    el.hidden = false;
   }
 
   function hideFormError() {
     var el = document.getElementById('formError');
     if (el) el.hidden = true;
-  }
-
-  async function sendPortalSms(firstName, mobile) {
-    if (!supabaseUrl) return;
-    const url = supabaseUrl + '/functions/v1/send-portal-sms';
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + supabaseAnonKey,
-      },
-      body: JSON.stringify({ first_name: firstName, mobile: mobile }),
-    });
-    if (!res.ok) {
-      console.warn('SMS send failed', await res.text());
-    }
   }
 
   function showConfirmAndGlitch() {
@@ -127,40 +122,87 @@
     var firstName = firstFromFullName(fullName);
     var lastName = fullName.trim().split(/\s+/).slice(1).join(' ') || null;
 
-    if (supabase) {
-      try {
-        var { data, error } = await supabase.from('bowlers').insert({
-          full_name: fullName,
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          mobile: mobile,
-          referrer: referrer || null,
-          country: country,
-          status: 'lead',
-        }).select('id').single();
+    if (!supabase) {
+      showFormError('Portal is not connected to the database. Please contact support.');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit';
+      }
+      return;
+    }
 
-        if (error) {
-          if (error.code === '23505') {
-            showFormError('This email or phone is already registered.');
-          } else {
-            showFormError(error.message || 'Submission failed. Try again.');
-          }
-          if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit';
-          }
-          return;
+    var orgId = (typeof window !== 'undefined' && window.PORTAL_CONFIG && window.PORTAL_CONFIG.organizationId) || null;
+    try {
+      var rpcPayload = {
+        p_full_name: fullName,
+        p_first_name: firstName,
+        p_last_name: lastName,
+        p_email: email,
+        p_mobile: mobile,
+        p_referrer: referrer || null,
+        p_country: country,
+        p_organization_id: orgId || null,
+      };
+      var rpcUrl = supabaseUrl + '/rest/v1/rpc/insert_portal_lead';
+      var rpcRes = await fetch(rpcUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + supabaseAnonKey,
+          'apikey': supabaseAnonKey,
+        },
+        body: JSON.stringify(rpcPayload),
+      });
+      var responseText = await rpcRes.text();
+      var bowlerId = null;
+      try {
+        bowlerId = responseText ? JSON.parse(responseText) : null;
+      } catch (_) {}
+      if (!rpcRes.ok) {
+        var errMsg = 'Submission failed. Try again.';
+        if (responseText) {
+          try {
+            var errBody = JSON.parse(responseText);
+            if (errBody.code === '23505' || (errBody.message && errBody.message.indexOf('unique') !== -1)) {
+              errMsg = 'This email or phone is already registered.';
+            } else if (errBody.message) {
+              errMsg = errBody.message;
+            }
+          } catch (_) {}
         }
-        await sendPortalSms(firstName, mobile);
-      } catch (err) {
-        showFormError('Network error. Try again.');
+        showFormError(errMsg);
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Submit';
         }
         return;
       }
+      var smsUrl = supabaseUrl + '/functions/v1/send-portal-sms';
+      fetch(smsUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + supabaseAnonKey,
+        },
+        body: JSON.stringify({
+          bowler_id: bowlerId,
+          first_name: firstName,
+          mobile: mobile,
+          organization_id: orgId || null,
+        }),
+      }).catch(function () {});
+    } catch (err) {
+      console.error('Portal submit error:', err);
+      var msg = err && err.message ? err.message : 'Network error. Try again.';
+      if (msg === 'Failed to fetch' || msg.indexOf('fetch') !== -1) {
+        msg = 'Could not reach the server. Check your connection; if you\'re on localhost, open DevTools (F12) → Network and try again to see the blocked request.';
+      }
+      showFormError(msg);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit';
+      }
+      return;
     }
 
     if (submitBtn) {

@@ -2,6 +2,8 @@
 
 Separate domain/app for bowlers: AI landing page → signup as **lead** → you enable portal login → they log in and complete onboarding → you set status to **confirmed**.
 
+**Live:** [https://your-portal.vercel.app/](https://your-portal.vercel.app/) (landing · [login](https://your-portal.vercel.app/login.html) · [portal](https://your-portal.vercel.app/portal.html) after login)
+
 ## Flow
 
 1. **Landing** (`index.html`): Terminal-style typing, eye, Join → form (full name, email, mobile, country, referrer). Submit → row in **bowlers** with `status = 'lead'`, SMS via Twilio.
@@ -26,14 +28,15 @@ Configure your static host so the app is served from the path you want.
 2. Run migrations in order (SQL Editor):
    - `supabase/migrations/20250220000000_create_portal_submissions.sql` (optional legacy table)
    - `supabase/migrations/20250220100000_create_bowlers_and_auth.sql` (bowlers table + Storage bucket)
-3. In `config.js` set:
-   - `supabaseUrl`: project URL
-   - `supabaseAnonKey`: anon key from **Settings → API**
+3. **Supabase config** (same project as the main TAKEOVER app so leads appear in Portal leads):
+   - **Vercel:** Set **Environment Variables**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and **`PORTAL_ORGANIZATION_ID`** (your org UUID — portal is your org’s landing page; leads are scoped to this org). Build generates `config.js` via `scripts/write-config.js`.
+   - **Local:** Copy `config.example.js` to `config.js` and set `supabaseUrl`, `supabaseAnonKey`, and `organizationId`.
 
 ### Bowlers table (logins + details)
 
 | Column | Source | Notes |
 |--------|--------|--------|
+| organization_id | Config / env | Our org — portal is our landing page; required for org-scoped leads |
 | email, full_name, first_name, last_name, mobile, referrer, country | Landing form | Unique email/mobile |
 | auth_user_id | Set when you enable login | FK to auth.users |
 | login_enabled_at | Set when you enable login | Must be set to allow sign-in |
