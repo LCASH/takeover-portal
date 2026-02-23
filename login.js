@@ -20,7 +20,7 @@
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
     errorEl.hidden = true;
-    var email = form.querySelector('[name="email"]').value.trim();
+    var email = form.querySelector('[name="email"]').value.trim().toLowerCase();
     var password = form.querySelector('[name="password"]').value;
 
     var btn = form.querySelector('button[type="submit"]');
@@ -29,7 +29,11 @@
     try {
       var { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password });
       if (authError) {
-        showError(authError.message || 'Sign in failed.');
+        var msg = authError.message || 'Sign in failed.';
+        if (authError.message && authError.message.toLowerCase().includes('invalid login')) {
+          msg = 'Invalid email or password. Use the exact email and password from your login message.';
+        }
+        showError(msg);
         if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
         return;
       }
