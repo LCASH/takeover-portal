@@ -4,6 +4,8 @@ Separate domain/app for bowlers: AI landing page → signup as **lead** → you 
 
 **Live:** [https://your-portal.vercel.app/](https://your-portal.vercel.app/) (landing · [login](https://your-portal.vercel.app/login.html) · [portal](https://your-portal.vercel.app/portal.html) after login)
 
+If you see **"Portal is not configured"** on login: set **SUPABASE_URL** and **SUPABASE_ANON_KEY** in Vercel (Project → Settings → Environment Variables), then **redeploy** so the build can write `config.js`.
+
 ## Flow
 
 1. **Landing** (`index.html`): Terminal-style typing, eye, Join → form (full name, email, mobile, country, referrer). Submit → row in **bowlers** with `status = 'lead'`, SMS via Twilio.

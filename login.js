@@ -3,7 +3,13 @@
   const supabaseUrl = (config.supabaseUrl || '').replace(/\/$/, '');
   const supabaseAnonKey = config.supabaseAnonKey || '';
   if (!supabaseUrl || !supabaseAnonKey) {
-    document.getElementById('loginError').textContent = 'Portal is not configured.';
+    var msg = 'Portal is not configured. ';
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      msg += 'Create a .env with SUPABASE_URL and SUPABASE_ANON_KEY, then run: npm run build && npm run serve';
+    } else {
+      msg += 'In Vercel (or your host), set Environment Variables: SUPABASE_URL and SUPABASE_ANON_KEY (same as TAKEOVER), then redeploy.';
+    }
+    document.getElementById('loginError').textContent = msg;
     document.getElementById('loginError').hidden = false;
     return;
   }
