@@ -2,6 +2,10 @@
   "buildCommand": "npm run build",
   "outputDirectory": ".",
   "framework": null,
+  "rewrites": [
+    { "source": "/portal", "destination": "/portal.html" },
+    { "source": "/login", "destination": "/login.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

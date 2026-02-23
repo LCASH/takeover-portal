@@ -60,7 +60,7 @@
         if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
         return;
       }
-      window.location.href = 'portal.html';
+      window.location.href = window.location.origin + '/portal.html';
     } catch (err) {
       showError(err.message || 'Something went wrong.');
       if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
