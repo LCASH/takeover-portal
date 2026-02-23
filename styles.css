@@ -1,6 +1,6 @@
 /* --- Reset & base --- */
 *, *::before, *::after { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; overflow: hidden; }
+html, body { min-height: 100%; margin: 0; }
 body {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
   background: #0a0a0b;

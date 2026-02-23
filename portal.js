@@ -127,6 +127,8 @@
     });
   }
 
+  // Form submit: writes directly to the same bowler row we loaded by auth_user_id (see init).
+  // All fields map to public.bowlers columns; RLS allows update only where auth_user_id = auth.uid().
   onboardingForm.addEventListener('submit', async function (e) {
     e.preventDefault();
     hideError();
@@ -165,6 +167,7 @@
       var licenseBackPath = await upload(licenseBackFile, 'license_back');
 
       var now = new Date().toISOString();
+      // Update the bowler row by id (same row we loaded with auth_user_id = session.user.id)
       var { error: updateErr } = await supabase
         .from('bowlers')
         .update({
@@ -179,6 +182,7 @@
           accept_betting_tcs_at: now,
           accept_bank_paypal_tcs_at: now,
           confirm_details_entered_at: now,
+          required_form_completed_at: now,
           status: 'onboarding_submitted',
           updated_at: now,
         })
