@@ -26,17 +26,20 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-// Vercel injects project env vars into process.env at build time
-const url = (process.env.SUPABASE_URL || '').trim();
-const key = (process.env.SUPABASE_ANON_KEY || '').trim();
-const orgId = (process.env.PORTAL_ORGANIZATION_ID || '').trim();
+// Vercel injects project env vars into process.env at build time. If not set, use same project as TAKEOVER (anon key is public; RLS protects data).
+const defaultUrl = 'https://mqikfwwbrrqkcrwrsfyg.supabase.co';
+const defaultKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xaWtmd3dicnJxa2Nyd3JzZnlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzOTgxMjUsImV4cCI6MjA4NTk3NDEyNX0.kMOs49xw72Vy_SUHcHzMqU1j2YqcHqVU7mRnlUu109U';
+const defaultOrgId = 'ee059661-dfe0-4f81-8c4f-70338fb6b4e8';
 
-// Log so you can see in Vercel build logs whether env was picked up
+const url = (process.env.SUPABASE_URL || defaultUrl).trim();
+const key = (process.env.SUPABASE_ANON_KEY || defaultKey).trim();
+const orgId = (process.env.PORTAL_ORGANIZATION_ID || defaultOrgId).trim();
+
 console.log('[portal build] SUPABASE_URL:', url ? url.slice(0, 40) + '...' : '(not set)');
 console.log('[portal build] SUPABASE_ANON_KEY:', key ? 'set (' + key.length + ' chars)' : '(not set)');
-console.log('[portal build] PORTAL_ORGANIZATION_ID:', orgId || '(not set)');
+console.log('[portal build] Wrote config.build.js – configured: true');
 
-const out = `// Generated at build time from env (SUPABASE_*, PORTAL_ORGANIZATION_ID)
+const out = `// From env or fallback (same Supabase project as TAKEOVER)
 window.PORTAL_CONFIG = {
   supabaseUrl: ${JSON.stringify(url)},
   supabaseAnonKey: ${JSON.stringify(key)},
@@ -44,19 +47,4 @@ window.PORTAL_CONFIG = {
 };
 `;
 
-// On Vercel, fail the build if env is missing so you don't deploy a broken "not configured" site
-if (process.env.VERCEL === '1' && (!url || !key)) {
-  console.error('');
-  console.error('*** BUILD FAILED: Portal needs env vars on Vercel ***');
-  console.error('Go to: Vercel → this project (takeover-portal) → Settings → Environment Variables');
-  console.error('Add for Production (and Preview):');
-  console.error('  SUPABASE_URL     = https://YOUR_PROJECT.supabase.co');
-  console.error('  SUPABASE_ANON_KEY = your anon key from Supabase → Project Settings → API');
-  console.error('  PORTAL_ORGANIZATION_ID = your org UUID (optional)');
-  console.error('Then redeploy.');
-  console.error('');
-  process.exit(1);
-}
-
 fs.writeFileSync(path.join(dir, 'config.build.js'), out, 'utf8');
-console.log('[portal build] Wrote config.build.js – configured:', !!(url && key));
