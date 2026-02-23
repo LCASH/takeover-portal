@@ -28,19 +28,41 @@
     formMessage.hidden = true;
   }
 
+  function docPublicUrl(path) {
+    if (!path || !supabaseUrl) return '';
+    return supabaseUrl + '/storage/v1/object/public/' + BUCKET + '/' + path;
+  }
+  function isImagePath(path) {
+    if (!path) return false;
+    var ext = (path.split('.').pop() || '').toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(ext) !== -1;
+  }
   function renderDocState() {
     if (!bowler) return;
-    setDocRow('selfieCurrent', 'selfieZone', bowler.selfie_url);
-    setDocRow('licenseFrontCurrent', 'licenseFrontZone', bowler.license_front_url);
-    setDocRow('licenseBackCurrent', 'licenseBackZone', bowler.license_back_url);
+    setDocRow('selfieCurrent', 'selfieZone', 'selfiePreview', bowler.selfie_url);
+    setDocRow('licenseFrontCurrent', 'licenseFrontZone', 'licenseFrontPreview', bowler.license_front_url);
+    setDocRow('licenseBackCurrent', 'licenseBackZone', 'licenseBackPreview', bowler.license_back_url);
   }
-  function setDocRow(currentId, zoneId, path) {
+  function setDocRow(currentId, zoneId, previewId, path) {
     var currentEl = document.getElementById(currentId);
     var zone = document.getElementById(zoneId);
+    var previewEl = document.getElementById(previewId);
     if (currentEl) currentEl.textContent = path ? 'Current: ' + path.split('/').pop() : '';
     if (zone) {
       zone.textContent = path ? 'Replace file' : 'Click to upload or replace';
       zone.classList.toggle('has-file', !!path);
+    }
+    if (previewEl) {
+      if (!path) {
+        previewEl.innerHTML = '';
+        return;
+      }
+      var url = docPublicUrl(path);
+      if (isImagePath(path)) {
+        previewEl.innerHTML = '<img src="' + url + '" alt="Uploaded" />';
+      } else {
+        previewEl.innerHTML = '<a href="' + url + '" target="_blank" rel="noopener">View document</a>';
+      }
     }
   }
 

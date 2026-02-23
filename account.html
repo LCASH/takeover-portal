@@ -39,6 +39,9 @@
     .doc-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
     .doc-row .upload-zone { flex: 1; min-width: 140px; padding: 0.75rem; text-align: center; border-radius: 8px; font-size: 0.8rem; }
     .doc-row .btn-remove { font-size: 0.75rem; padding: 0.35rem 0.6rem; }
+    .doc-preview { width: 120px; height: 90px; border-radius: 8px; overflow: hidden; background: #1a1d21; border: 1px solid #2d3139; flex-shrink: 0; }
+    .doc-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .doc-preview a { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 0.7rem; color: #5dbbff; }
   </style>
 </head>
 <body class="p-4 md:p-8 min-h-screen">
@@ -87,27 +90,42 @@
       <section class="mb-10 pt-8 border-t border-[#2d3139]">
         <h2 class="text-sm font-bold mono uppercase tracking-widest text-[#5dbbff] mb-4">Your ID documents</h2>
         <p class="text-sm text-gray-400 mb-4">Replace or remove your selfie and license uploads. Changes save immediately.</p>
-        <div class="space-y-4">
-          <div class="doc-row">
+        <div class="space-y-6">
+          <div class="doc-row items-center gap-4">
             <span class="text-xs font-bold text-gray-400 uppercase w-28 shrink-0">Selfie</span>
-            <div class="upload-zone" id="selfieZone" data-suffix="selfie">Click to upload or replace</div>
-            <input type="file" id="selfieInput" accept="image/*,.pdf" class="hidden" />
-            <button type="button" id="selfieRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
-            <span id="selfieCurrent" class="text-xs text-gray-500"></span>
+            <div id="selfiePreview" class="doc-preview"></div>
+            <div class="flex flex-col gap-1">
+              <div class="upload-zone" id="selfieZone" data-suffix="selfie">Click to upload or replace</div>
+              <input type="file" id="selfieInput" accept="image/*,.pdf" class="hidden" />
+              <div class="flex items-center gap-2">
+                <button type="button" id="selfieRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
+                <span id="selfieCurrent" class="text-xs text-gray-500"></span>
+              </div>
+            </div>
           </div>
-          <div class="doc-row">
+          <div class="doc-row items-center gap-4">
             <span class="text-xs font-bold text-gray-400 uppercase w-28 shrink-0">License front</span>
-            <div class="upload-zone" id="licenseFrontZone" data-suffix="license_front">Click to upload or replace</div>
-            <input type="file" id="licenseFrontInput" accept="image/*,.pdf" class="hidden" />
-            <button type="button" id="licenseFrontRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
-            <span id="licenseFrontCurrent" class="text-xs text-gray-500"></span>
+            <div id="licenseFrontPreview" class="doc-preview"></div>
+            <div class="flex flex-col gap-1">
+              <div class="upload-zone" id="licenseFrontZone" data-suffix="license_front">Click to upload or replace</div>
+              <input type="file" id="licenseFrontInput" accept="image/*,.pdf" class="hidden" />
+              <div class="flex items-center gap-2">
+                <button type="button" id="licenseFrontRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
+                <span id="licenseFrontCurrent" class="text-xs text-gray-500"></span>
+              </div>
+            </div>
           </div>
-          <div class="doc-row">
+          <div class="doc-row items-center gap-4">
             <span class="text-xs font-bold text-gray-400 uppercase w-28 shrink-0">License back</span>
-            <div class="upload-zone" id="licenseBackZone" data-suffix="license_back">Click to upload or replace</div>
-            <input type="file" id="licenseBackInput" accept="image/*,.pdf" class="hidden" />
-            <button type="button" id="licenseBackRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
-            <span id="licenseBackCurrent" class="text-xs text-gray-500"></span>
+            <div id="licenseBackPreview" class="doc-preview"></div>
+            <div class="flex flex-col gap-1">
+              <div class="upload-zone" id="licenseBackZone" data-suffix="license_back">Click to upload or replace</div>
+              <input type="file" id="licenseBackInput" accept="image/*,.pdf" class="hidden" />
+              <div class="flex items-center gap-2">
+                <button type="button" id="licenseBackRemove" class="btn-secondary rounded px-2 py-1 btn-remove">Remove</button>
+                <span id="licenseBackCurrent" class="text-xs text-gray-500"></span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
