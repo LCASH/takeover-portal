@@ -4,5 +4,5 @@ window.PORTAL_CONFIG = {
   supabaseUrl: '',
   supabaseAnonKey: '',
   organizationId: null,
-  discordInviteUrl: null
+  telegramInviteUrl: null
 };
