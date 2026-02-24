@@ -49,6 +49,7 @@
               <input type="tel" name="mobile_number" required autocomplete="tel-national" placeholder="e.g. 403432913" inputmode="numeric" pattern="[0-9\s\-]+" title="Enter number without country code (no leading +)" />
             </span>
             <small class="mobile-hint">Choose country code, then enter your number without the leading 0</small>
+            <small class="mobile-important">We'll send next steps and login details to this number</small>
           </label>
           <label>
             <span>Country</span>
@@ -74,7 +75,11 @@
   <div class="glitch-overlay" id="glitchOverlay" hidden></div>
 
   <!-- Blackout -->
-  <div class="blackout" id="blackout" hidden></div>
+  <div class="blackout" id="blackout" hidden>
+    <div class="blackout-msg">
+      <p>Check your phone for a message from us.</p>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.build.js"></script>
