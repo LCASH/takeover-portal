@@ -19,8 +19,8 @@
   const statusSubtext = document.getElementById('statusSubtext');
   const confirmedLine = document.getElementById('confirmedLine');
   const signOutLink = document.getElementById('signOutLink');
-  const discordLink = document.getElementById('discordLink');
-  const discordCard = document.getElementById('discordCard');
+  const telegramLink = document.getElementById('telegramLink');
+  const telegramCard = document.getElementById('telegramCard');
 
   let bowler = null;
 
@@ -47,9 +47,9 @@
       confirmedLine.hidden = status !== 'confirmed';
       confirmedLine.classList.toggle('hidden', status !== 'confirmed');
     }
-    var discordUrl = (window.PORTAL_CONFIG && window.PORTAL_CONFIG.discordInviteUrl) || '';
-    if (discordLink) discordLink.href = discordUrl || '#';
-    if (discordCard) discordCard.style.display = discordUrl ? '' : 'none';
+    var tgUrl = (window.PORTAL_CONFIG && window.PORTAL_CONFIG.telegramInviteUrl) || '';
+    if (telegramLink) telegramLink.href = tgUrl || '#';
+    if (telegramCard) telegramCard.style.display = tgUrl ? '' : 'none';
     thanksEl.hidden = false;
   }
 

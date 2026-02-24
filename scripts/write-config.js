@@ -34,7 +34,7 @@ const defaultOrgId = 'ee059661-dfe0-4f81-8c4f-70338fb6b4e8';
 const url = (process.env.SUPABASE_URL || defaultUrl).trim();
 const key = (process.env.SUPABASE_ANON_KEY || defaultKey).trim();
 const orgId = (process.env.PORTAL_ORGANIZATION_ID || defaultOrgId).trim();
-const discordUrl = (process.env.PORTAL_DISCORD_INVITE_URL || '').trim();
+const telegramUrl = (process.env.PORTAL_TELEGRAM_INVITE_URL || 'https://t.me/+cEXIzO199AY5Yjhl').trim();
 
 console.log('[portal build] SUPABASE_URL:', url ? url.slice(0, 40) + '...' : '(not set)');
 console.log('[portal build] SUPABASE_ANON_KEY:', key ? 'set (' + key.length + ' chars)' : '(not set)');
@@ -45,7 +45,7 @@ window.PORTAL_CONFIG = {
   supabaseUrl: ${JSON.stringify(url)},
   supabaseAnonKey: ${JSON.stringify(key)},
   organizationId: ${orgId ? JSON.stringify(orgId) : 'null'},
-  discordInviteUrl: ${discordUrl ? JSON.stringify(discordUrl) : 'null'}
+  telegramInviteUrl: ${telegramUrl ? JSON.stringify(telegramUrl) : 'null'}
 };
 `;
 
