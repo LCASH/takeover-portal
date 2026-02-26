@@ -71,7 +71,7 @@ body {
   50% { opacity: 0; }
 }
 
-/* --- Center block: eye + button --- */
+/* --- Center block: eye + button + intro text --- */
 .center-block {
   position: absolute;
   left: 50%;
@@ -80,7 +80,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem 1.25rem;
 }
 .eye-wrap {
   width: 80px;
@@ -154,6 +158,69 @@ body {
 }
 .join-btn:hover {
   box-shadow: 0 0 20px rgba(138, 226, 52, 0.5);
+}
+
+/* --- Intro text (after eye blinks) --- */
+.intro-text {
+  width: 100%;
+  max-width: 32rem;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition: opacity 0.6s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+.intro-text[hidden] {
+  display: none;
+}
+.intro-text.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.intro-text p,
+.intro-text ul {
+  margin: 0 0 0.85rem 0;
+  font-size: clamp(0.8rem, 2.2vw + 0.65rem, 0.95rem);
+  line-height: 1.6;
+  color: #c2d4a8;
+}
+.intro-text p:last-child {
+  margin-bottom: 0;
+}
+.intro-text strong {
+  color: #8ae234;
+  font-weight: 500;
+}
+.intro-text ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.35rem;
+}
+.intro-text ul li {
+  position: relative;
+  padding-left: 1.25rem;
+  margin-bottom: 0.4rem;
+}
+.intro-text ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 0.4em;
+  height: 0.4em;
+  background: #8ae234;
+  border-radius: 50%;
+}
+.intro-text-inner {
+  max-height: 45vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0.25rem;
+}
+@media (min-width: 640px) {
+  .intro-text-inner {
+    max-height: none;
+  }
 }
 
 /* --- Form --- */

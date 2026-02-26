@@ -68,14 +68,22 @@
     }
   }
 
+  const introText = document.getElementById('introText');
+
   function blink() {
     eyeEl.classList.add('blink');
     setTimeout(function () {
       eyeEl.classList.remove('blink');
       blinkCount++;
       if (blinkCount === 2) {
-        joinBtn.hidden = false;
-        joinBtn.classList.add('visible');
+        if (introText) {
+          introText.hidden = false;
+          introText.classList.add('visible');
+        }
+        setTimeout(function () {
+          joinBtn.hidden = false;
+          joinBtn.classList.add('visible');
+        }, 400);
       }
     }, 140);
   }
@@ -88,6 +96,7 @@
   function onJoinClick() {
     formWrap.hidden = false;
     screen.classList.add('form-active');
+    if (introText) introText.hidden = true;
     joinBtn.hidden = true;
   }
 
