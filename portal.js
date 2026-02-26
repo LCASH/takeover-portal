@@ -208,45 +208,75 @@
     var ext = function (f) { return f.name.split('.').pop()?.toLowerCase() || 'jpg'; };
     var prefix = bowler.id + '/';
 
+    var MAX_FILE_MB = 6;
+    var maxBytes = MAX_FILE_MB * 1024 * 1024;
+    if (selfieFile.size > maxBytes || licenseFrontFile.size > maxBytes || licenseBackFile.size > maxBytes) {
+      showError('One or more files are too large (max ' + MAX_FILE_MB + 'MB each). Use smaller photos or compress them, then try again.');
+      return;
+    }
+
+    function withRetry(fn, label) {
+      var attempts = 3;
+      return function () {
+        var lastErr;
+        return (function run() {
+          return fn().catch(function (err) {
+            lastErr = err;
+            attempts--;
+            if (attempts > 0) {
+              return new Promise(function (r) { setTimeout(r, 1500); }).then(run);
+            }
+            throw lastErr;
+          });
+        })();
+      };
+    }
+
     try {
-      // Upload to Supabase Storage; store object path in DB. Full image URL = {supabaseUrl}/storage/v1/object/public/portal-documents/{path}
       var upload = async function (file, pathSuffix) {
         var path = prefix + pathSuffix + '.' + ext(file);
-        var { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true });
-        if (upErr) throw upErr;
-        return path;
+        var doUpload = function () {
+          return supabase.storage.from(BUCKET).upload(path, file, { upsert: true }).then(function (_ref) {
+            var error = _ref.error;
+            if (error) throw error;
+            return path;
+          });
+        };
+        return withRetry(doUpload, pathSuffix)();
       };
       var selfiePath = await upload(selfieFile, 'selfie');
       var licenseFrontPath = await upload(licenseFrontFile, 'license_front');
       var licenseBackPath = await upload(licenseBackFile, 'license_back');
 
       var now = new Date().toISOString();
-      // Update the bowler row by id (same row we loaded with auth_user_id = session.user.id)
-      var { error: updateErr } = await supabase
-        .from('bowlers')
-        .update({
-          date_of_birth: dateOfBirth,
-          address: address,
-          referrer: referrer,
-          previous_betting_accounts: previousBettingAccounts,
-          banks_consent: banksChecked,
-          bank_account_name: bankAccountName,
-          bank_bsb: bankBsb,
-          bank_account_number: bankAccountNumber,
-          bank_pay_id: bankPayId,
-          selfie_url: selfiePath,
-          license_front_url: licenseFrontPath,
-          license_back_url: licenseBackPath,
-          accept_betting_tcs_at: now,
-          accept_bank_paypal_tcs_at: now,
-          confirm_details_entered_at: now,
-          required_form_completed_at: now,
-          status: 'onboarding_submitted',
-          onboarding_stage: 'form_submitted',
-          updated_at: now,
-        })
-        .eq('id', bowler.id);
-      if (updateErr) throw updateErr;
+      var updatePayload = {
+        date_of_birth: dateOfBirth,
+        address: address,
+        referrer: referrer,
+        previous_betting_accounts: previousBettingAccounts,
+        banks_consent: banksChecked,
+        bank_account_name: bankAccountName,
+        bank_bsb: bankBsb,
+        bank_account_number: bankAccountNumber,
+        bank_pay_id: bankPayId,
+        selfie_url: selfiePath,
+        license_front_url: licenseFrontPath,
+        license_back_url: licenseBackPath,
+        accept_betting_tcs_at: now,
+        accept_bank_paypal_tcs_at: now,
+        confirm_details_entered_at: now,
+        required_form_completed_at: now,
+        status: 'onboarding_submitted',
+        onboarding_stage: 'form_submitted',
+        updated_at: now,
+      };
+      var doUpdate = function () {
+        return supabase.from('bowlers').update(updatePayload).eq('id', bowler.id).then(function (_ref2) {
+          var error = _ref2.error;
+          if (error) throw error;
+        });
+      };
+      await withRetry(doUpdate, 'update')();
 
       // Trigger form-submission reassurance SMS (Edge Function sends SMS and inserts into Inbox)
       var config = window.PORTAL_CONFIG || {};
@@ -271,8 +301,12 @@
       onboardingEl.hidden = true;
       showDashboard(bowler);
     } catch (err) {
-      showError(err.message || 'Submission failed. Try again.');
-      if (btn) { btn.disabled = false; btn.textContent = 'Submit'; }
+      var friendly = 'Connection or server issue — nothing was saved yet. Your form is still here. Try again (e.g. on Wi‑Fi or with smaller photos).';
+      if (err && err.message && /size|large|quota/i.test(err.message)) {
+        friendly = 'File too large or quota exceeded. Use smaller photos (under ' + MAX_FILE_MB + 'MB each) and try again.';
+      }
+      showError(friendly);
+      if (btn) { btn.disabled = false; btn.textContent = 'Submit application'; }
     }
   });
 
