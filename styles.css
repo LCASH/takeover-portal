@@ -37,20 +37,31 @@ body {
 /* --- Screen container --- */
 .screen {
   min-height: 100vh;
-  padding: 1.5rem 1.5rem 4rem;
+  min-height: 100dvh;
+  padding: max(1.25rem, env(safe-area-inset-top)) 1.25rem 4rem;
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 .center-wrapper {
-  flex: 1 1 0;
+  flex: 0 0 auto;
   width: 100%;
   max-width: 36rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 0 auto;
+  min-height: calc(100vh - 6rem);
+}
+.center-wrapper.intro-visible {
+  justify-content: flex-start;
   min-height: 0;
 }
 

@@ -69,6 +69,7 @@
   }
 
   const introText = document.getElementById('introText');
+  const centerWrapper = document.querySelector('.center-wrapper');
 
   function blink() {
     eyeEl.classList.add('blink');
@@ -80,6 +81,7 @@
           introText.hidden = false;
           introText.classList.add('visible');
         }
+        if (centerWrapper) centerWrapper.classList.add('intro-visible');
         setTimeout(function () {
           joinBtn.hidden = false;
           joinBtn.classList.add('visible');
