@@ -14,7 +14,8 @@
     Portal not configured. Set <code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>, and <code>PORTAL_ORGANIZATION_ID</code> in <code>.env</code> and run <code>npm run build</code>.
   </div>
   <div class="screen">
-    <!-- Eye + Join: center of page -->
+    <!-- Eye + intro + Join: centered, page scrolls when tall -->
+    <div class="center-wrapper">
     <div class="center-block">
       <div class="eye-wrap" id="eyeWrap">
         <div class="eye" id="eye">
@@ -38,6 +39,7 @@
         </div>
       </div>
       <button type="button" class="join-btn" id="joinBtn" hidden>Join</button>
+    </div>
     </div>
 
     <!-- Form (hidden until Join clicked) -->
