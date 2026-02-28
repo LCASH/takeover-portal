@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,85 +8,117 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <style>
     :root {
-      --bg-dark: #0f1113;
-      --surface: #1a1d21;
-      --accent: #5dbbff;
-      --success: #7cfc00;
-      --text-dim: #9ca3af;
+      --bg-dark: #f8fafc;
+      /* slate-50 */
+      --surface: #ffffff;
+      /* white */
+      --accent: #3b82f6;
+      /* blue-500 */
+      --success: #10b981;
+      /* emerald-500 */
+      --text-dim: #64748b;
+      /* slate-500 */
     }
+
     body {
       background-color: var(--bg-dark);
-      color: white;
+      color: #0f172a;
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
-    .mono { font-family: 'JetBrains Mono', monospace; }
+
     .input-field {
       background-color: var(--surface);
-      border: 1px solid #2d3139;
+      border: 1px solid #e2e8f0;
+      /* slate-200 */
       transition: all 0.2s ease;
     }
+
     .input-field:focus {
       border-color: var(--accent);
       outline: none;
-      box-shadow: 0 0 0 2px rgba(93, 187, 255, 0.1);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
+
     .btn-primary {
       background-color: var(--success);
-      color: #000;
-      font-weight: 700;
+      color: #fff;
+      font-weight: 500;
       transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
+
     .btn-primary:hover {
-      filter: brightness(1.1);
-      box-shadow: 0 0 20px rgba(124, 252, 0, 0.2);
+      background-color: #059669;
+      /* emerald-600 */
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+      transform: translateY(-1px);
     }
-    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
     .glass-panel {
-      background: rgba(26, 29, 33, 0.8);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.9);
+      /* white */
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     }
-    .form-error-msg { color: #ef2929; font-size: 0.8rem; margin-bottom: 0.5rem; }
+
+    .form-error-msg {
+      color: #fca5a5;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
   </style>
 </head>
+
 <body class="flex items-center justify-center p-4">
   <div class="w-full max-w-md">
-    <div class="glass-panel p-8 rounded-2xl shadow-2xl">
+    <div class="glass-panel p-8 rounded-2xl">
       <header class="text-center mb-8">
-        <div class="inline-block p-3 rounded-full bg-[#5dbbff]/10 mb-4">
-          <svg class="w-8 h-8 text-[#5dbbff]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        <div class="inline-block p-3 rounded-full bg-blue-500/10 mb-4">
+          <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
         </div>
-        <h2 class="text-2xl font-bold mono tracking-tighter uppercase">Portal login</h2>
-        <p class="text-xs text-gray-500 mt-2 mono">ENCRYPTED SESSION // READY</p>
+        <h2 class="text-2xl font-semibold tracking-tight">Portal Secure Login</h2>
+        <p class="text-sm text-slate-500 mt-2">Enter your credentials to access your account</p>
       </header>
 
       <p id="loginError" class="form-error-msg" hidden></p>
       <form id="loginForm" class="space-y-6">
         <div>
-          <label class="block mono text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Email</label>
-          <input type="email" name="email" required autocomplete="email" placeholder="name@domain.com" class="w-full input-field rounded-lg px-4 py-3 text-white placeholder-gray-700" />
+          <label class="block text-xs font-medium uppercase text-slate-500 mb-2 tracking-wide">Email Address</label>
+          <input type="email" name="email" required autocomplete="email" placeholder="name@domain.com"
+            class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500" />
         </div>
         <div>
-          <label class="block mono text-[10px] font-bold uppercase text-gray-400 mb-2 tracking-widest">Password</label>
-          <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••" class="w-full input-field rounded-lg px-4 py-3 text-white placeholder-gray-700" />
+          <label class="block text-xs font-medium uppercase text-slate-500 mb-2 tracking-wide">Password</label>
+          <input type="password" name="password" required autocomplete="current-password" placeholder="••••••••"
+            class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500" />
         </div>
-        <button type="submit" class="btn-primary w-full py-4 rounded-lg text-sm uppercase tracking-[0.2em] mono shadow-lg">
-          Sign in
+        <button type="submit" class="btn-primary w-full py-3.5 rounded-lg text-sm tracking-wide shadow-lg mt-2">
+          Sign In
         </button>
-        <div class="text-center pt-2">
-          <a href="index.html" class="text-[10px] mono uppercase text-gray-500 hover:text-[#5dbbff] transition-colors">Back to landing</a>
+        <div class="text-center pt-4">
+          <a href="index.html" class="text-xs text-slate-500 hover:text-blue-600 transition-colors">Return to home</a>
         </div>
       </form>
     </div>
-    <p class="text-center mt-8 text-[10px] text-gray-600 mono uppercase">System v4.2.0-secure</p>
+    <p class="text-center mt-8 text-xs text-slate-400">Secure Access Portal &copy; 2026</p>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.build.js"></script>
   <script src="login.js"></script>
 </body>
+
 </html>

@@ -1,14 +1,31 @@
 /* --- Reset & base --- */
-*, *::before, *::after { box-sizing: border-box; }
-html, body { min-height: 100%; margin: 0; }
-html { overflow-x: hidden; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
 body {
-  font-family: 'JetBrains Mono', 'Consolas', monospace;
-  background: #0a0a0b;
-  color: #8ae234;
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #ffffff;
+  /* zinc-950 */
+  color: #0f172a;
+  /* zinc-100 */
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* --- Config banner (dev / unconfigured) --- */
@@ -20,16 +37,22 @@ body {
   z-index: 1000;
   padding: 0.6rem 1rem;
   font-size: 0.75rem;
-  background: #1a1a1e;
-  border-bottom: 1px solid #2a2a2e;
-  color: #729fcf;
+  background-color: #f8fafc;
+  /* zinc-900 */
+  border-bottom: 1px solid #e2e8f0;
+  /* zinc-800 */
+  color: #fca5a5;
+  /* red-300 for visibility when unconfigured */
+  text-align: center;
 }
+
 .config-banner code {
-  background: #0a0a0b;
+  background: #f1f5f9;
   padding: 0.1em 0.35em;
   border-radius: 4px;
   font-size: 0.85em;
 }
+
 .config-banner[hidden] {
   display: none;
 }
@@ -49,6 +72,7 @@ body {
   width: 100%;
   box-sizing: border-box;
 }
+
 .center-wrapper {
   flex: 0 0 auto;
   width: 100%;
@@ -60,38 +84,52 @@ body {
   margin: 0 auto;
   min-height: calc(100vh - 6rem);
 }
+
 .center-wrapper.intro-visible {
   justify-content: flex-start;
   min-height: 0;
 }
 
-/* --- Terminal block (top-left) --- */
+/* --- Terminal block (top-left) - Retained for structure but restyled lightly, though script will fade it --- */
 .terminal {
   display: flex;
   align-items: flex-start;
   gap: 0.35rem;
   max-width: 90vw;
   margin-bottom: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  /* Keeping mono just for the prompt part if any remains */
+  font-size: 0.85rem;
 }
+
 .terminal-prompt {
-  color: #729fcf;
+  color: #94a3b8;
+  /* zinc-500 */
   flex-shrink: 0;
   user-select: none;
 }
+
 .terminal-line {
   word-break: break-word;
   line-height: 1.5;
 }
+
 .typed-text {
-  color: #d3d7cf;
+  color: #64748b;
+  /* zinc-400 */
   white-space: pre-line;
 }
+
 .cursor {
-  color: #8ae234;
+  color: #3b82f6;
+  /* blue-500 */
   animation: blink-cursor 1s step-end infinite;
 }
+
 @keyframes blink-cursor {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* --- Center block: eye + intro text + button --- */
@@ -104,139 +142,188 @@ body {
   gap: 1.5rem;
   padding: 1rem 0 1.5rem;
 }
+
+/* Redesigned logo "eye" -> minimal crest/ring turned back into an eye */
 .eye-wrap {
   width: 80px;
-  height: 48px;
+  height: 80px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .eye {
-  width: 100%;
-  height: 100%;
+  width: 56px;
+  height: 56px;
   position: relative;
-  border: 2px solid #3d3d3d;
-  border-radius: 50%;
-  background: #111;
+  border: 2px solid #e2e8f0;
+  /* zinc-800 */
+  border-radius: 75% 0px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  /* subtle continuous breathing effect if wanted, but user just wanted blink */
 }
+
 .eye-lid {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 100%;
-  background: #0a0a0b;
-  transform-origin: top center;
-  transform: scaleY(0);
-  transition: transform 0.08s ease-out;
-  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: 120px;
+  height: 120px;
+  background: #ffffff;
+  /* zinc-950, matches bg */
+  margin-top: -60px;
+  margin-left: -60px;
+  transform: rotate(-45deg) translateY(-85px);
+  /* hide above */
+  transition: transform 0.1s ease-in;
+  z-index: 10;
+  border-bottom: 2px solid #cbd5e1;
+  /* eyelid bottom edge */
 }
+
 .eye.blink .eye-lid {
-  transform: scaleY(1);
-  transition: transform 0.12s ease-in;
+  transform: rotate(-45deg) translateY(0);
+  /* cover the eye */
 }
+
 .eye-iris {
   position: absolute;
-  left: 50%;
   top: 50%;
-  width: 36px;
-  height: 36px;
-  margin: -18px 0 0 -18px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #5c5c5c, #1a1a1a);
-  border: 1px solid #2d2d2d;
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  /* blue-400 to blue-500 */
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
 }
+
 .eye-pupil {
   position: absolute;
-  left: 50%;
   top: 50%;
-  width: 12px;
-  height: 12px;
-  margin: -6px 0 0 -6px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #8ae234;
-  box-shadow: 0 0 8px #8ae234;
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
 }
+
 .join-btn {
   font-family: inherit;
-  font-size: 0.9rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #0a0a0b;
-  background: #8ae234;
-  border: none;
-  padding: 0.75rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  background-color: #3b82f6;
+  /* blue-500 */
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem 2.5rem;
   cursor: pointer;
   opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.2s ease;
+  transform: translateY(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
 }
+
 .join-btn.visible {
   opacity: 1;
-  transform: scale(1);
+  transform: translateY(0);
 }
+
 .join-btn:hover {
-  box-shadow: 0 0 20px rgba(138, 226, 52, 0.5);
+  background-color: #2563eb;
+  /* blue-600 */
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.join-btn:active {
+  transform: translateY(1px);
 }
 
 /* --- Intro text (after eye blinks) --- */
 .intro-text {
   width: 100%;
   opacity: 0;
-  transform: translateY(0.5rem);
-  transition: opacity 0.6s ease, transform 0.5s ease;
+  transform: translateY(1rem);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
 }
+
 .intro-text[hidden] {
   display: none;
 }
+
 .intro-text.visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
 }
+
 .intro-text-inner {
   padding: 0 1rem;
   width: 100%;
   box-sizing: border-box;
 }
+
 @media (max-width: 480px) {
   .intro-text-inner {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
   }
 }
+
 .intro-text p,
 .intro-text ul {
-  margin: 0 0 0.85rem 0;
-  font-size: clamp(0.875rem, 2.5vw + 0.7rem, 1rem);
-  line-height: 1.65;
-  color: #c2d4a8;
+  margin: 0 0 1.25rem 0;
+  font-size: clamp(0.95rem, 2.5vw + 0.8rem, 1.05rem);
+  line-height: 1.7;
+  color: #64748b;
+  /* zinc-400 */
+  font-weight: 400;
 }
+
 .intro-text p:last-child {
   margin-bottom: 0;
 }
+
 .intro-text strong {
-  color: #8ae234;
+  color: #0f172a;
+  /* zinc-100 */
   font-weight: 500;
 }
+
 .intro-text ul {
   list-style: none;
   padding-left: 0;
-  margin-top: 0.35rem;
+  margin-top: 0.5rem;
 }
+
 .intro-text ul li {
   position: relative;
-  padding-left: 1.25rem;
-  margin-bottom: 0.4rem;
+  padding-left: 1.5rem;
+  margin-bottom: 0.6rem;
+  color: #334155;
+  /* zinc-200 */
 }
+
 .intro-text ul li::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 0.5em;
-  width: 0.4em;
-  height: 0.4em;
-  background: #8ae234;
+  top: 0.55em;
+  width: 0.5em;
+  height: 0.5em;
+  background-color: #10b981;
+  /* emerald-500 */
   border-radius: 50%;
 }
 
@@ -247,174 +334,220 @@ body {
   top: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 380px;
+  max-width: 420px;
   padding: 0 1.25rem;
 }
+
 .form-card {
-  background: #121214;
-  border: 1px solid #2a2a2e;
-  border-radius: 14px;
-  padding: 1.75rem 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.02);
+  background-color: #f8fafc;
+  /* zinc-900 */
+  border: 1px solid #e2e8f0;
+  /* zinc-800 */
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
 }
+
 .form-reassurance {
-  font-size: 0.8rem;
-  color: #9ca3af;
-  margin: 0 0 1.25rem 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  /* zinc-400 */
+  margin: 0 0 1.5rem 0;
   line-height: 1.5;
-  padding-left: 1.35rem;
+  padding-left: 1.5rem;
   position: relative;
 }
+
 .form-reassurance::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 0.35rem;
+  top: 0.4rem;
   width: 8px;
   height: 8px;
-  background: #8ae234;
+  background-color: #10b981;
+  /* emerald-500 */
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(138, 226, 52, 0.5);
 }
+
 .portal-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
+
 .portal-form label {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  font-size: 0.8rem;
-  color: #d1d5db;
+  font-size: 0.85rem;
+  color: #334155;
+  /* zinc-200 */
   font-weight: 500;
-  letter-spacing: 0.02em;
 }
+
 .portal-form label em {
   font-style: normal;
-  color: #6b7280;
+  color: #94a3b8;
+  /* zinc-500 */
   font-weight: 400;
 }
+
 .portal-form input {
   font-family: inherit;
   font-size: 0.95rem;
-  padding: 0.65rem 0.85rem;
-  background: #0f0f10;
-  border: 1px solid #27272a;
-  color: #e5e7eb;
+  padding: 0.75rem 1rem;
+  background-color: #ffffff;
+  /* zinc-950 */
+  border: 1px solid #e2e8f0;
+  /* zinc-800 */
+  color: #0f172a;
   border-radius: 8px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .portal-form input::placeholder {
-  color: #6b7280;
+  color: #94a3b8;
+  /* zinc-600 */
 }
+
 .portal-form input:hover {
-  border-color: #3f3f46;
+  border-color: #94a3b8;
+  /* zinc-700 */
 }
+
 .portal-form input:focus {
   outline: none;
-  border-color: #8ae234;
-  box-shadow: 0 0 0 2px rgba(138, 226, 52, 0.2);
+  border-color: #3b82f6;
+  /* blue-500 */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
+
 .portal-form select {
   font-family: inherit;
   font-size: 0.95rem;
-  padding: 0.65rem 0.85rem;
-  background: #0f0f10;
-  border: 1px solid #27272a;
-  color: #e5e7eb;
+  padding: 0.75rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
   border-radius: 8px;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .portal-form select:hover {
-  border-color: #3f3f46;
+  border-color: #94a3b8;
 }
+
 .mobile-row {
   display: flex;
   gap: 0.5rem;
   align-items: stretch;
 }
+
 .mobile-row select {
-  width: 10.5rem;
+  width: 10rem;
   flex-shrink: 0;
 }
+
 .mobile-row input {
   flex: 1;
   min-width: 0;
 }
+
 .mobile-hint {
-  font-size: 0.7rem;
-  color: #6b7280;
-  margin-top: 0.15rem;
-  line-height: 1.35;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  /* zinc-500 */
+  margin-top: 0.25rem;
+  line-height: 1.4;
 }
+
 .mobile-important {
   display: block;
-  font-size: 0.7rem;
-  color: #8ae234;
+  font-size: 0.8rem;
+  color: #3b82f6;
+  /* blue-500 */
   margin-top: 0.25rem;
-  line-height: 1.35;
-  letter-spacing: 0.01em;
+  line-height: 1.4;
 }
+
 .portal-form select:focus {
   outline: none;
-  border-color: #8ae234;
-  box-shadow: 0 0 0 2px rgba(138, 226, 52, 0.2);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
+
 .submit-btn {
   font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #0a0a0b;
-  background: #8ae234;
-  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #10b981;
+  /* emerald-500 */
+  border: 1px solid rgba(0, 0, 0, 0.1);
   padding: 0.85rem 1.5rem;
   cursor: pointer;
   margin-top: 0.5rem;
   border-radius: 8px;
-  transition: box-shadow 0.2s ease, background 0.2s ease, transform 0.1s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
+
 .submit-btn:hover {
-  box-shadow: 0 0 24px rgba(138, 226, 52, 0.4);
-  background: #9ee34a;
+  background-color: #059669;
+  /* emerald-600 */
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+  transform: translateY(-1px);
 }
+
 .submit-btn:active {
-  transform: scale(0.99);
+  transform: translateY(1px);
 }
+
 .submit-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
-  background: #8ae234;
+  background-color: #059669;
+  /* emerald-600 */
+  transform: none;
 }
+
 .form-error-msg {
-  color: #f87171;
-  font-size: 0.8rem;
+  color: #fca5a5;
+  /* red-300 */
+  font-size: 0.85rem;
   margin-bottom: 0.75rem;
-  line-height: 1.4;
-  padding: 0.5rem 0.75rem;
-  background: rgba(248, 113, 113, 0.08);
-  border-radius: 6px;
+  line-height: 1.5;
+  padding: 0.75rem 1rem;
+  background: rgba(248, 113, 113, 0.1);
+  border-radius: 8px;
   border: 1px solid rgba(248, 113, 113, 0.2);
 }
+
 .form-error-msg[hidden] {
   display: none;
 }
+
 .form-footer {
   margin: 1.25rem 0 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid #27272a;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e2e8f0;
+  /* zinc-800 */
   text-align: center;
 }
+
 .form-footer a {
-  color: #729fcf;
+  color: #94a3b8;
+  /* zinc-500 */
   font-size: 0.85rem;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
+
 .form-footer a:hover {
-  text-decoration: underline;
+  color: #0f172a;
+  /* zinc-100 */
 }
 
 /* --- Confirm message --- */
@@ -425,88 +558,25 @@ body {
   transform: translate(-50%, -50%);
   text-align: center;
   max-width: 80vw;
-  font-size: 0.95rem;
-  color: #d3d7cf;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #0f172a;
   line-height: 1.6;
 }
 
-/* --- Glitch overlay --- */
-.glitch-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 100;
-  background: transparent;
-}
-.glitch-overlay.active {
-  animation: glitch 0.5s steps(1) 4;
-}
-.glitch-overlay.active::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #fff;
-  opacity: 0;
-  animation: glitch-flash 0.5s steps(1) 4;
-}
-@keyframes glitch-flash {
-  15%, 45% { opacity: 0.12; }
-  30%, 60% { opacity: 0; }
-}
-@keyframes glitch {
-  0%   { filter: none; transform: translate(0); }
-  8%  { filter: none; transform: translate(-3px, 1px); }
-  16% { filter: none; transform: translate(4px, -2px); }
-  24% { filter: none; transform: translate(-2px, -1px); }
-  32% { filter: none; transform: translate(2px, 2px); }
-  40% { filter: none; transform: translate(-4px, 0); }
-  48% { filter: none; transform: translate(1px, -2px); }
-  56% { filter: none; transform: translate(-1px, 1px); }
-  64% { filter: none; transform: translate(3px, -1px); }
-  72% { filter: none; transform: translate(-2px, 2px); }
-  80% { filter: none; transform: translate(0); }
-  100% { filter: none; transform: translate(0); }
-}
+/* Animations removed in favor of direct state classes. */
 
-/* --- Blackout --- */
-.blackout {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  z-index: 200;
-  opacity: 0;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.blackout.visible {
-  animation: fade-black 0.8s ease forwards;
-  pointer-events: auto;
-}
-.blackout-msg {
-  text-align: center;
-  opacity: 0;
-  animation: blackout-text-in 0.6s ease 1.4s forwards;
-}
-.blackout-msg p {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1rem;
-  color: #8ae234;
-  letter-spacing: 0.04em;
-}
-@keyframes fade-black {
-  to { opacity: 1; }
-}
-@keyframes blackout-text-in {
-  to { opacity: 1; }
-}
 
 /* --- Hide elements used for layout swap --- */
 .screen.form-active .terminal,
 .screen.form-active .center-wrapper,
-.screen.form-active .center-block { visibility: hidden; }
+.screen.form-active .center-block {
+  visibility: hidden;
+}
+
 .screen.confirm-active .terminal,
 .screen.confirm-active .center-wrapper,
 .screen.confirm-active .center-block,
-.screen.confirm-active .form-wrap { visibility: hidden; }
+.screen.confirm-active .form-wrap {
+  visibility: hidden;
+}

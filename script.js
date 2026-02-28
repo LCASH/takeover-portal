@@ -6,8 +6,6 @@
   const formWrap = document.getElementById('formWrap');
   const portalForm = document.getElementById('portalForm');
   const confirmMsg = document.getElementById('confirmMsg');
-  const glitchOverlay = document.getElementById('glitchOverlay');
-  const blackout = document.getElementById('blackout');
   const screen = document.querySelector('.screen');
 
   let blinkCount = 0;
@@ -98,8 +96,12 @@
   function onJoinClick() {
     formWrap.hidden = false;
     screen.classList.add('form-active');
-    if (introText) introText.hidden = true;
-    joinBtn.hidden = true;
+    if (introText) {
+      introText.classList.remove('visible');
+      setTimeout(() => introText.hidden = true, 500); 
+    }
+    joinBtn.classList.remove('visible');
+    setTimeout(() => joinBtn.hidden = true, 500);
   }
 
   function firstFromFullName(fullName) {
@@ -121,22 +123,15 @@
     if (el) el.hidden = true;
   }
 
-  function showConfirmAndGlitch() {
+  function showConfirm() {
     formWrap.hidden = true;
     confirmMsg.hidden = false;
     screen.classList.remove('form-active');
     screen.classList.add('confirm-active');
-    setTimeout(triggerGlitchThenBlack, 2200);
-  }
-
-  function triggerGlitchThenBlack() {
-    glitchOverlay.hidden = false;
-    glitchOverlay.classList.add('active');
-    setTimeout(function () {
-      glitchOverlay.classList.remove('active');
-      blackout.hidden = false;
-      blackout.classList.add('visible');
-    }, 700);
+    // After 3 seconds, let them know to check their phone
+    setTimeout(function() {
+      confirmMsg.innerHTML = '<p>Check your phone for a message from us.</p>';
+    }, 3000);
   }
 
   async function onFormSubmit(e) {
@@ -253,7 +248,7 @@
       submitBtn.disabled = false;
       submitBtn.textContent = 'Submit';
     }
-    showConfirmAndGlitch();
+    showConfirm();
   }
 
   joinBtn.addEventListener('click', onJoinClick);
