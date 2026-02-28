@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -9,37 +10,39 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <div class="config-banner" id="configBanner" hidden aria-live="polite">
-    Portal not configured. Set <code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>, and <code>PORTAL_ORGANIZATION_ID</code> in <code>.env</code> and run <code>npm run build</code>.
+    Portal not configured. Set <code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>, and
+    <code>PORTAL_ORGANIZATION_ID</code> in <code>.env</code> and run <code>npm run build</code>.
   </div>
   <div class="screen">
     <!-- Eye + intro + Join: centered, page scrolls when tall -->
     <div class="center-wrapper">
-    <div class="center-block">
-      <div class="eye-wrap" id="eyeWrap">
-        <div class="eye" id="eye">
-          <div class="eye-lid"></div>
-          <div class="eye-iris"></div>
-          <div class="eye-pupil"></div>
+      <div class="center-block">
+        <div class="eye-wrap" id="eyeWrap">
+          <div class="eye" id="eye">
+            <div class="eye-lid"></div>
+            <div class="eye-iris"></div>
+            <div class="eye-pupil"></div>
+          </div>
         </div>
-      </div>
-      <div class="intro-text" id="introText" hidden aria-live="polite">
-        <div class="intro-text-inner">
-          <p>We are building a truth-powered, transparency-focused club that helps members benefit from systems that are often intentionally complex or difficult to navigate alone. Like Prometheus, our mission is to give humans the gift of fire, by providing knowledge and consciousness to all areas.</p>
-          <p>Betting is one of the first areas we operate in, like taking fire from the gods, we take value from the bookmakers, giving back to the people of this club.</p>
-          <p><strong>Members are compensated for participating:</strong></p>
-          <ul>
-            <li>$100 upfront when you join</li>
-            <li>$25 per week while active</li>
-            <li>$50 for each person you refer</li>
-          </ul>
-          <p>Nothing is ever done without your clear knowledge and consent, and you remain in control at all times.</p>
-          <p>If you're interested in becoming a member, click "Join" to submit your details and we'll guide you through the next steps.</p>
+        <div class="intro-text" id="introText" hidden aria-live="polite">
+          <div class="intro-text-inner">
+            <ul>
+              <li>$100 on succesful signup</li>
+              <li>$25 per week while active</li>
+              <li>$50 per referral</li>
+            </ul>
+            <p>We’re building a transparency-first club that helps members benefit from systems designed to be complex.
+            </p>
+            <p>We learn how they work — and return the value to our people.</p>
+            <p>We’re starting with betting, and we’ll expand into other areas where value can be taken back and shared.
+            </p>
+          </div>
         </div>
+        <button type="button" class="join-btn" id="joinBtn" hidden>Join</button>
       </div>
-      <button type="button" class="join-btn" id="joinBtn" hidden>Join</button>
-    </div>
     </div>
 
     <!-- Form (hidden until Join clicked) -->
@@ -62,14 +65,16 @@
               <select name="mobile_country" required aria-label="Country code" title="Country code">
                 <!-- Populated by script from PORTAL_PHONE_COUNTRY_CODES -->
               </select>
-              <input type="tel" name="mobile_number" required autocomplete="tel-national" placeholder="e.g. 403432913" inputmode="numeric" pattern="[0-9\s\-]+" title="Enter number without country code (no leading +)" />
+              <input type="tel" name="mobile_number" required autocomplete="tel-national" placeholder="e.g. 403432913"
+                inputmode="numeric" pattern="[0-9\s\-]+" title="Enter number without country code (no leading +)" />
             </span>
             <small class="mobile-hint">Choose country code, then enter your number without the leading 0</small>
             <small class="mobile-important">We'll send next steps and login details to this number</small>
           </label>
           <label>
             <span>Country</span>
-            <input type="text" name="country" id="countryInput" list="country-list" required placeholder="Type to search..." autocomplete="off" />
+            <input type="text" name="country" id="countryInput" list="country-list" required
+              placeholder="Type to search..." autocomplete="off" />
             <datalist id="country-list"></datalist>
           </label>
           <label>
@@ -94,4 +99,5 @@
   <script src="countries.js"></script>
   <script src="script.js"></script>
 </body>
+
 </html>
