@@ -1,4 +1,6 @@
 (function () {
+  // Portal dashboard: shows application status for returning users who log in.
+  // Onboarding form has been moved to the signup flow (index.html Step 2).
   const config = window.PORTAL_CONFIG || {};
   const supabaseUrl = (config.supabaseUrl || '').replace(/\/$/, '');
   const supabaseAnonKey = config.supabaseAnonKey || '';
@@ -7,14 +9,10 @@
     return;
   }
   const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-  const BUCKET = 'portal-documents';
 
   const loadingEl = document.getElementById('loadingEl');
   const accessDeniedEl = document.getElementById('accessDeniedEl');
-  const onboardingEl = document.getElementById('onboardingEl');
   const thanksEl = document.getElementById('thanksEl');
-  const onboardingForm = document.getElementById('onboardingForm');
-  const formError = document.getElementById('formError');
   const statusLabel = document.getElementById('statusLabel');
   const statusSubtext = document.getElementById('statusSubtext');
   const confirmedLine = document.getElementById('confirmedLine');
@@ -53,72 +51,7 @@
     thanksEl.hidden = false;
   }
 
-  function showError(msg) {
-    formError.textContent = msg;
-    formError.hidden = false;
-  }
-  function hideError() {
-    formError.hidden = true;
-  }
-
-  function setUploadZoneText(zone, text) {
-    var textEl = zone.querySelector('.upload-text');
-    if (textEl) textEl.textContent = text;
-    else zone.textContent = text;
-  }
-
-  function setupBanks() {
-    const list = document.getElementById('banksList');
-    if (!list || !window.PORTAL_BANKS) return;
-    list.innerHTML = '';
-    window.PORTAL_BANKS.forEach(function (bank) {
-      var label = document.createElement('label');
-      label.className = 'bank-card flex items-center p-3 rounded-lg gap-3 hover:bg-[#23272c]';
-      var input = document.createElement('input');
-      input.type = 'checkbox';
-      input.name = 'banks_consent';
-      input.value = bank;
-      input.addEventListener('change', function () { label.classList.toggle('selected', input.checked); });
-      label.appendChild(input);
-      label.appendChild(document.createTextNode(bank));
-      list.appendChild(label);
-    });
-  }
-
-  function setupUpload(idZone, idInput) {
-    var zone = document.getElementById(idZone);
-    var input = document.getElementById(idInput);
-    if (!zone || !input) return;
-    var defaultText = zone.getAttribute('data-placeholder') || 'Drop files here or browse';
-    function highlight() { zone.classList.add('dragover'); }
-    function unhighlight() { zone.classList.remove('dragover'); }
-    function updateLabel() {
-      var name = input.files[0] && input.files[0].name;
-      setUploadZoneText(zone, name ? '\u2713 ' + name : defaultText);
-      zone.classList.toggle('has-file', !!name);
-    }
-    zone.addEventListener('click', function () { input.click(); });
-    zone.addEventListener('dragover', function (e) { e.preventDefault(); highlight(); });
-    zone.addEventListener('dragleave', unhighlight);
-    zone.addEventListener('drop', function (e) {
-      e.preventDefault();
-      unhighlight();
-      if (e.dataTransfer.files.length) input.files = e.dataTransfer.files;
-      updateLabel();
-    });
-    input.addEventListener('change', updateLabel);
-  }
-
-  function onboardingComplete(b) {
-    return !!(b && b.date_of_birth && b.selfie_url && b.license_front_url && b.license_back_url);
-  }
-
   async function init() {
-    setupBanks();
-    setupUpload('selfieZone', 'selfieInput');
-    setupUpload('licenseFrontZone', 'licenseFrontInput');
-    setupUpload('licenseBackZone', 'licenseBackInput');
-
     var { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
       loadingEl.hidden = true;
@@ -146,28 +79,7 @@
     bowler = b;
 
     loadingEl.hidden = true;
-    if (onboardingComplete(bowler)) {
-      // Refetch so status is up to date when they return to the portal
-      var { data: fresh } = await supabase.from('bowlers').select('*').eq('id', bowler.id).single();
-      if (fresh) bowler = fresh;
-      showDashboard(bowler);
-    } else {
-      onboardingEl.hidden = false;
-      if (bowler.date_of_birth) onboardingForm.querySelector('[name="date_of_birth"]').value = bowler.date_of_birth;
-      if (bowler.address) onboardingForm.querySelector('[name="address"]').value = bowler.address;
-      if (bowler.referrer) onboardingForm.querySelector('[name="referrer"]').value = bowler.referrer;
-      if (bowler.previous_betting_accounts) onboardingForm.querySelector('[name="previous_betting_accounts"]').value = bowler.previous_betting_accounts;
-      if (bowler.banks_consent && bowler.banks_consent.length) {
-        bowler.banks_consent.forEach(function (bank) {
-          var cb = onboardingForm.querySelector('input[name="banks_consent"][value="' + bank + '"]');
-          if (cb) {
-            cb.checked = true;
-            var label = cb.closest('label');
-            if (label) label.classList.add('selected');
-          }
-        });
-      }
-    }
+    showDashboard(bowler);
 
     signOutLink.addEventListener('click', async function (e) {
       e.preventDefault();
@@ -175,140 +87,6 @@
       window.location.href = 'login.html';
     });
   }
-
-  // Form submit: writes directly to the same bowler row we loaded by auth_user_id (see init).
-  // All fields map to public.bowlers columns; RLS allows update only where auth_user_id = auth.uid().
-  onboardingForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    hideError();
-    if (!bowler) return;
-    var selfieFile = document.getElementById('selfieInput').files[0];
-    var licenseFrontFile = document.getElementById('licenseFrontInput').files[0];
-    var licenseBackFile = document.getElementById('licenseBackInput').files[0];
-    if (!selfieFile || !licenseFrontFile || !licenseBackFile) {
-      showError('Please upload Selfie ID, Front of License, and Back of License.');
-      return;
-    }
-    var btn = onboardingForm.querySelector('button[type="submit"]');
-    if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
-
-    var dateOfBirth = onboardingForm.querySelector('[name="date_of_birth"]').value || null;
-    var address = onboardingForm.querySelector('[name="address"]').value || null;
-    var referrer = onboardingForm.querySelector('[name="referrer"]').value || null;
-    var previousBettingAccounts = onboardingForm.querySelector('[name="previous_betting_accounts"]').value || null;
-    var bankAccountName = onboardingForm.querySelector('[name="bank_account_name"]').value || null;
-    var bankBsb = onboardingForm.querySelector('[name="bank_bsb"]').value || null;
-    var bankAccountNumber = onboardingForm.querySelector('[name="bank_account_number"]').value || null;
-    var bankPayId = onboardingForm.querySelector('[name="bank_pay_id"]').value || null;
-    var banksChecked = [];
-    onboardingForm.querySelectorAll('input[name="banks_consent"]:checked').forEach(function (cb) {
-      banksChecked.push(cb.value);
-    });
-
-    var ext = function (f) { return f.name.split('.').pop()?.toLowerCase() || 'jpg'; };
-    var prefix = bowler.id + '/';
-
-    var MAX_FILE_MB = 6;
-    var maxBytes = MAX_FILE_MB * 1024 * 1024;
-    if (selfieFile.size > maxBytes || licenseFrontFile.size > maxBytes || licenseBackFile.size > maxBytes) {
-      showError('One or more files are too large (max ' + MAX_FILE_MB + 'MB each). Use smaller photos or compress them, then try again.');
-      return;
-    }
-
-    function withRetry(fn, label) {
-      var attempts = 3;
-      return function () {
-        var lastErr;
-        return (function run() {
-          return fn().catch(function (err) {
-            lastErr = err;
-            attempts--;
-            if (attempts > 0) {
-              return new Promise(function (r) { setTimeout(r, 1500); }).then(run);
-            }
-            throw lastErr;
-          });
-        })();
-      };
-    }
-
-    try {
-      var upload = async function (file, pathSuffix) {
-        var path = prefix + pathSuffix + '.' + ext(file);
-        var doUpload = function () {
-          return supabase.storage.from(BUCKET).upload(path, file, { upsert: true }).then(function (_ref) {
-            var error = _ref.error;
-            if (error) throw error;
-            return path;
-          });
-        };
-        return withRetry(doUpload, pathSuffix)();
-      };
-      var selfiePath = await upload(selfieFile, 'selfie');
-      var licenseFrontPath = await upload(licenseFrontFile, 'license_front');
-      var licenseBackPath = await upload(licenseBackFile, 'license_back');
-
-      var now = new Date().toISOString();
-      var updatePayload = {
-        date_of_birth: dateOfBirth,
-        address: address,
-        referrer: referrer,
-        previous_betting_accounts: previousBettingAccounts,
-        banks_consent: banksChecked,
-        bank_account_name: bankAccountName,
-        bank_bsb: bankBsb,
-        bank_account_number: bankAccountNumber,
-        bank_pay_id: bankPayId,
-        selfie_url: selfiePath,
-        license_front_url: licenseFrontPath,
-        license_back_url: licenseBackPath,
-        accept_betting_tcs_at: now,
-        accept_bank_paypal_tcs_at: now,
-        confirm_details_entered_at: now,
-        required_form_completed_at: now,
-        status: 'onboarding_submitted',
-        onboarding_stage: 'form_submitted',
-        updated_at: now,
-      };
-      var doUpdate = function () {
-        return supabase.from('bowlers').update(updatePayload).eq('id', bowler.id).then(function (_ref2) {
-          var error = _ref2.error;
-          if (error) throw error;
-        });
-      };
-      await withRetry(doUpdate, 'update')();
-
-      // Trigger form-submission reassurance SMS (Edge Function sends SMS and inserts into Inbox)
-      var config = window.PORTAL_CONFIG || {};
-      var supabaseUrl = (config.supabaseUrl || '').replace(/\/$/, '');
-      var session = (await supabase.auth.getSession()).data.session;
-      if (session && supabaseUrl) {
-        try {
-          await fetch(supabaseUrl + '/functions/v1/portal-submit-required-form', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + session.access_token,
-              'apikey': (config.supabaseAnonKey || '').trim()
-            },
-            body: JSON.stringify({})
-          });
-        } catch (_) { /* non-blocking; SMS best-effort */ }
-      }
-
-      bowler.status = 'onboarding_submitted';
-      bowler.required_form_completed_at = now;
-      onboardingEl.hidden = true;
-      showDashboard(bowler);
-    } catch (err) {
-      var friendly = 'Connection or server issue — nothing was saved yet. Your form is still here. Try again (e.g. on Wi‑Fi or with smaller photos).';
-      if (err && err.message && /size|large|quota/i.test(err.message)) {
-        friendly = 'File too large or quota exceeded. Use smaller photos (under ' + MAX_FILE_MB + 'MB each) and try again.';
-      }
-      showError(friendly);
-      if (btn) { btn.disabled = false; btn.textContent = 'Submit application'; }
-    }
-  });
 
   init();
 })();

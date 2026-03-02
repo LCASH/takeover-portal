@@ -62,7 +62,7 @@
       }
       if (!bowler || !bowler.login_enabled_at) {
         await supabase.auth.signOut();
-        showError('Your account is not yet enabled for portal access. We will reach out when you can log in.');
+        showError('Your application is still being reviewed. We\'ll send you an SMS with your login details once approved.');
         if (btn) { btn.disabled = false; btn.textContent = 'Sign in'; }
         return;
       }

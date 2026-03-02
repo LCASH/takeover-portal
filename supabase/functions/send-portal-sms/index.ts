@@ -1,5 +1,6 @@
-// Portal welcome SMS via Twilio. Twilio from env TWILIO_* or from bowler's org (organizations.settings.twilio).
-// Body: { bowler_id?, first_name, mobile }. Updates bowlers.landing_sms_sent_at / landing_sms_error.
+// Portal SMS via Twilio. Twilio from env TWILIO_* or from bowler's org (organizations.settings.twilio).
+// Body: { bowler_id?, first_name, mobile, organization_id? }. Updates bowlers.landing_sms_sent_at / landing_sms_error.
+// Note: No longer called by the landing page (video verification removed). Kept for manual/admin use.
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -75,7 +76,7 @@ serve(async (req) => {
     const { accountSid, authToken, fromNumber } = twilio;
     const to = mobile.startsWith('+') ? mobile : '+' + mobile.replace(/\D/g, '');
     const smsBody =
-      `Hey ${first_name}, for authentication reasons i need to make sure you are who you say you are. In order to do this i just need you to record a video saying: "hey this is (your name)"`;
+      `Hey ${first_name}, thanks for signing up! We're reviewing your application and will be in touch soon.`;
     const url = `${TWILIO_URL}/${accountSid}/Messages.json`;
     const params = new URLSearchParams({ To: to, From: fromNumber, Body: smsBody });
     const res = await fetch(url, {
