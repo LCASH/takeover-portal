@@ -18,42 +18,60 @@
       margin: 0 auto;
       padding: 2rem 1rem 4rem;
     }
+
     .onboarding-wrap .input-field {
       background-color: #ffffff;
       border: 1px solid #e2e8f0;
       transition: all 0.2s ease;
     }
+
     .onboarding-wrap .input-field:focus {
       border-color: #3b82f6;
       outline: none;
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
+
     .onboarding-wrap .bank-card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
       cursor: pointer;
       transition: all 0.2s;
     }
-    .onboarding-wrap .bank-card:hover { border-color: #3f3f46; }
+
+    .onboarding-wrap .bank-card:hover {
+      border-color: #3f3f46;
+    }
+
     .onboarding-wrap .bank-card.selected {
       border-color: #3b82f6;
       background: rgba(59, 130, 246, 0.05);
     }
+
     .onboarding-wrap .upload-zone {
       border: 2px dashed #e2e8f0;
       background: rgba(248, 250, 252, 0.5);
       transition: all 0.3s ease;
       cursor: pointer;
     }
+
     .onboarding-wrap .upload-zone:hover {
       border-color: #3b82f6;
       background: rgba(59, 130, 246, 0.02);
     }
-    .onboarding-wrap .upload-zone.dragover { border-color: #3b82f6; }
-    .onboarding-wrap .upload-zone.has-file { border-color: #10b981; color: #34d399; }
+
+    .onboarding-wrap .upload-zone.dragover {
+      border-color: #3b82f6;
+    }
+
+    .onboarding-wrap .upload-zone.has-file {
+      border-color: #10b981;
+      color: #34d399;
+    }
+
     .onboarding-wrap input[type="checkbox"] {
       appearance: none;
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border: 2px solid #52525b;
       border-radius: 4px;
       background-color: transparent;
@@ -63,29 +81,43 @@
       flex-shrink: 0;
       transition: all 0.15s ease-in-out;
     }
+
     .onboarding-wrap input[type="checkbox"]::before {
       content: "";
-      width: 10px; height: 10px;
+      width: 10px;
+      height: 10px;
       transform: scale(0);
       transition: 120ms transform ease-in-out;
       box-shadow: inset 1em 1em white;
       background-color: CanvasText;
       clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
     }
+
     .onboarding-wrap input[type="checkbox"]:checked {
       background-color: #3b82f6;
       border-color: #3b82f6;
     }
-    .onboarding-wrap input[type="checkbox"]:checked::before { transform: scale(1); }
+
+    .onboarding-wrap input[type="checkbox"]:checked::before {
+      transform: scale(1);
+    }
+
     .onboarding-wrap .banks-list {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 0.75rem;
     }
+
     @media (min-width: 640px) {
-      .onboarding-wrap .banks-list { grid-template-columns: repeat(3, 1fr); }
+      .onboarding-wrap .banks-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
-    .onboarding-wrap .banks-list label { margin-bottom: 0; }
+
+    .onboarding-wrap .banks-list label {
+      margin-bottom: 0;
+    }
+
     .onboarding-wrap .onboarding-submit-btn {
       background-color: #10b981;
       color: #fff;
@@ -93,17 +125,23 @@
       transition: all 0.2s ease;
       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
+
     .onboarding-wrap .onboarding-submit-btn:hover {
       background-color: #059669;
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
     }
-    .onboarding-wrap .onboarding-submit-btn:active { transform: translateY(1px); }
+
+    .onboarding-wrap .onboarding-submit-btn:active {
+      transform: translateY(1px);
+    }
+
     .onboarding-wrap .onboarding-submit-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
     }
+
     /* Screen states for onboarding */
     .screen.onboarding-active .terminal,
     .screen.onboarding-active .center-wrapper,
@@ -193,7 +231,8 @@
     <div class="onboarding-wrap" id="onboardingWrap" hidden>
       <header class="mb-8">
         <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Complete your application</h1>
-        <div class="mt-4 p-4 bg-slate-100/50 border-l-4 border-blue-500 rounded-r shadow-sm text-sm text-slate-600 leading-relaxed">
+        <div
+          class="mt-4 p-4 bg-slate-100/50 border-l-4 border-blue-500 rounded-r shadow-sm text-sm text-slate-600 leading-relaxed">
           Please provide the following details to complete your application. All data is encrypted and secure.
         </div>
       </header>
@@ -202,27 +241,37 @@
         <!-- Personal details -->
         <div class="space-y-6">
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Date of birth <span class="text-blue-500">*</span></label>
-            <input type="date" name="date_of_birth" required class="w-full input-field rounded-lg px-4 py-3 text-slate-900" />
+            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Date of birth <span
+                class="text-blue-500">*</span></label>
+            <input type="date" name="date_of_birth" required
+              class="w-full input-field rounded-lg px-4 py-3 text-slate-900" />
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Address <span class="text-blue-500">*</span></label>
-            <input type="text" name="address" required placeholder="Full residential address" class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
+            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Address <span
+                class="text-blue-500">*</span></label>
+            <input type="text" name="address" required placeholder="Full residential address"
+              class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Referrer <span class="text-blue-500">*</span></label>
-            <input type="text" name="referrer" required placeholder="Name of referrer" class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
+            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Referrer <span
+                class="text-blue-500">*</span></label>
+            <input type="text" name="referrer" required placeholder="Name of referrer"
+              class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">All previous betting accounts <span class="text-blue-500">*</span></label>
+            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">All previous betting
+              accounts <span class="text-blue-500">*</span></label>
             <p class="text-[11px] text-slate-500 mb-2">e.g., TAB, Sportsbet, Bet365, etc.</p>
-            <textarea name="previous_betting_accounts" required placeholder="List any existing accounts you hold..." rows="4" class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 resize-none"></textarea>
+            <textarea name="previous_betting_accounts" required placeholder="List any existing accounts you hold..."
+              rows="4"
+              class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 resize-none"></textarea>
           </div>
         </div>
 
         <!-- Bank selection -->
         <section class="pt-6 border-t border-slate-200">
-          <label class="block text-xs font-semibold uppercase text-slate-500 mb-1 tracking-wide">Select managed banks <span class="text-blue-500">*</span></label>
+          <label class="block text-xs font-semibold uppercase text-slate-500 mb-1 tracking-wide">Select managed banks
+            <span class="text-blue-500">*</span></label>
           <p class="text-sm text-slate-500 mb-6">Choosing options below may qualify you for additional compensation.</p>
           <div class="banks-list" id="banksList"></div>
         </section>
@@ -230,23 +279,28 @@
         <!-- Identity verification -->
         <section class="space-y-6 pt-6 border-t border-slate-200">
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Identity Verification <span class="text-blue-500">*</span></label>
-            <p class="text-[11px] text-slate-500 mb-3">Please upload a clear, legible selfie ID to verify your identity.</p>
-            <div class="upload-zone rounded-xl p-8 text-center" id="selfieZone" data-placeholder="Choose file or drag here">
+            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Identity Verification
+              <span class="text-blue-500">*</span></label>
+            <p class="text-[11px] text-slate-500 mb-3">Please upload a clear, legible selfie ID to verify your identity.
+            </p>
+            <div class="upload-zone rounded-xl p-8 text-center" id="selfieZone"
+              data-placeholder="Choose file or drag here">
               <span class="upload-text text-sm text-slate-500">Choose file or drag here</span>
             </div>
             <input type="file" id="selfieInput" accept="image/*,.pdf" class="hidden" />
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">ID Front <span class="text-blue-500">*</span></label>
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">ID Front <span
+                  class="text-blue-500">*</span></label>
               <div class="upload-zone rounded-xl p-6 text-center" id="licenseFrontZone" data-placeholder="Upload front">
                 <span class="upload-text text-sm text-slate-500">Upload front</span>
               </div>
               <input type="file" id="licenseFrontInput" accept="image/*,.pdf" class="hidden" />
             </div>
             <div>
-              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">ID Back <span class="text-blue-500">*</span></label>
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">ID Back <span
+                  class="text-blue-500">*</span></label>
               <div class="upload-zone rounded-xl p-6 text-center" id="licenseBackZone" data-placeholder="Upload back">
                 <span class="upload-text text-sm text-slate-500">Upload back</span>
               </div>
@@ -259,40 +313,53 @@
         <section class="space-y-6 pt-6 border-t border-slate-200">
           <header>
             <h2 class="text-sm font-semibold text-slate-900 tracking-wide">Payout Details</h2>
-            <p class="text-sm text-slate-500 mt-1">Provide an account for your payments. Data is encrypted and secure.</p>
+            <p class="text-sm text-slate-500 mt-1">Provide an account for your payments. Data is encrypted and secure.
+            </p>
           </header>
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Account name <span class="text-blue-500">*</span></label>
-            <input type="text" name="bank_account_name" required placeholder="e.g. John Smith" class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
+            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Account name <span
+                class="text-blue-500">*</span></label>
+            <input type="text" name="bank_account_name" required placeholder="e.g. John Smith"
+              class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Routing / BSB <span class="text-blue-500">*</span></label>
-              <input type="text" name="bank_bsb" required placeholder="e.g. 062-000" class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Routing / BSB <span
+                  class="text-blue-500">*</span></label>
+              <input type="text" name="bank_bsb" required placeholder="e.g. 062-000"
+                class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
             </div>
             <div>
-              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Account number <span class="text-blue-500">*</span></label>
-              <input type="text" name="bank_account_number" required placeholder="e.g. 12345678" class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
+              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Account number
+                <span class="text-blue-500">*</span></label>
+              <input type="text" name="bank_account_number" required placeholder="e.g. 12345678"
+                class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
             </div>
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">PayID / Swift (optional)</label>
-            <input type="text" name="bank_pay_id" placeholder="Additional payout reference" class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
+            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">PayID / Swift
+              (optional)</label>
+            <input type="text" name="bank_pay_id" placeholder="Additional payout reference"
+              class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400" />
           </div>
         </section>
 
         <!-- Consent video -->
         <section class="space-y-4 pt-6 border-t border-slate-200">
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Consent Video <span class="text-blue-500">*</span></label>
-            <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r shadow-sm text-sm text-slate-600 leading-relaxed mb-4">
+            <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Consent Video <span
+                class="text-blue-500">*</span></label>
+            <div
+              class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r shadow-sm text-sm text-slate-600 leading-relaxed mb-4">
               Please upload a short video of yourself saying:<br>
               <strong class="text-slate-900">"I consent to you managing my betting account and betting bank"</strong>
             </div>
-            <div class="upload-zone rounded-xl p-8 text-center" id="consentVideoZone" data-placeholder="Upload video (.mp4, .mov, .webm)">
+            <div class="upload-zone rounded-xl p-8 text-center" id="consentVideoZone"
+              data-placeholder="Upload video (.mp4, .mov, .webm)">
               <span class="upload-text text-sm text-slate-500">Upload video (.mp4, .mov, .webm)</span>
             </div>
-            <input type="file" id="consentVideoInput" accept="video/mp4,video/webm,video/quicktime,.mp4,.mov,.webm" class="hidden" />
+            <input type="file" id="consentVideoInput" accept="video/mp4,video/webm,video/quicktime,.mp4,.mov,.webm"
+              class="hidden" />
             <p class="text-[11px] text-slate-400 mt-2">Max 50MB. Record on your phone, then upload the file.</p>
           </div>
         </section>
@@ -301,28 +368,60 @@
         <section class="space-y-4 pt-6 mt-6 border-t border-slate-200">
           <label class="flex items-start gap-4 cursor-pointer group">
             <input type="checkbox" name="accept_betting_tcs" required class="mt-0.5" />
-            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I accept the Platform Terms & Conditions <span class="text-blue-500">*</span></span>
+            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I accept the Platform
+              Terms & Conditions <span class="text-blue-500">*</span></span>
           </label>
           <label class="flex items-start gap-4 cursor-pointer group">
             <input type="checkbox" name="accept_bank_paypal_tcs" required class="mt-0.5" />
-            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I accept the Payment Provider Terms & Conditions <span class="text-blue-500">*</span></span>
+            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I accept the Payment
+              Provider Terms & Conditions <span class="text-blue-500">*</span></span>
           </label>
           <label class="flex items-start gap-4 cursor-pointer group">
             <input type="checkbox" name="confirm_details" required class="mt-0.5" />
-            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I confirm all provided details are legally mine <span class="text-blue-500">*</span></span>
+            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I confirm all provided
+              details are legally mine <span class="text-blue-500">*</span></span>
           </label>
         </section>
 
         <div class="pt-6 pb-12">
-          <button type="submit" class="onboarding-submit-btn w-full py-4 rounded-lg text-sm font-semibold tracking-wide shadow-lg">Submit Application</button>
+          <button type="submit"
+            class="onboarding-submit-btn w-full py-4 rounded-lg text-sm font-semibold tracking-wide shadow-lg">Submit
+            Application</button>
         </div>
       </form>
     </div>
 
     <!-- Post-submit message -->
     <div class="confirm-msg" id="confirmMsg" hidden>
-      <p>We are reviewing your account information now.</p>
-      <p style="font-size: 0.9rem; color: #64748b; margin-top: 1rem;">Submission pending — we will send you an SMS with your login details once approved.</p>
+      <div style="max-width: 28rem; margin: 0 auto; text-align: center; padding: 2rem 1rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+        <h2 style="font-size: 1.5rem; font-weight: 600; color: #0f172a; margin-bottom: 0.75rem;">Thanks for joining!
+        </h2>
+        <p style="color: #475569; line-height: 1.6; margin-bottom: 1.25rem;">
+          We've sent your login details to your mobile. You can log in anytime to update your details.
+        </p>
+        <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem;">
+          We'll review your application and reach out within <strong style="color: #334155;">24 hours</strong>.
+        </p>
+        <a id="telegramJoinBtn" href="#" target="_blank" rel="noopener"
+          style="display: inline-flex; align-items: center; gap: 0.5rem; background: #0088cc; color: #fff; text-decoration: none; padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.95rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,136,204,0.3);"
+          onmouseover="this.style.background='#006da3';this.style.transform='translateY(-1px)'"
+          onmouseout="this.style.background='#0088cc';this.style.transform='none'">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+          </svg>
+          Join the Telegram Group
+        </a>
+        <script>
+          (function() {
+            var btn = document.getElementById('telegramJoinBtn');
+            var tgUrl = (window.PORTAL_CONFIG && window.PORTAL_CONFIG.telegramInviteUrl) || '';
+            if (btn && tgUrl) { btn.href = tgUrl; }
+            else if (btn) { btn.style.display = 'none'; }
+          })();
+        </script>
+      </div>
     </div>
   </div>
 

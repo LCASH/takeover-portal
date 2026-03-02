@@ -22,18 +22,18 @@
   // Anon client for Step 1 (no session storage)
   const noStorage = {
     getItem: function () { return null; },
-    setItem: function () {},
-    removeItem: function () {},
+    setItem: function () { },
+    removeItem: function () { },
   };
   const anonClient = supabaseUrl && supabaseAnonKey
     ? window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
-          storage: noStorage,
-        },
-      })
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+        storage: noStorage,
+      },
+    })
     : null;
 
   // Authenticated client created after Step 1 signup
@@ -330,7 +330,7 @@
       });
 
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit'; }
-      showOnboarding();
+      showPostSubmission();
     } catch (err) {
       console.error('Portal submit error:', err);
       var msg = err && err.message ? err.message : 'Network error. Try again.';
