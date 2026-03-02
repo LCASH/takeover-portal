@@ -246,6 +246,12 @@
     screen.classList.remove('onboarding-active');
     confirmMsg.hidden = false;
     screen.classList.add('confirm-active');
+    // Wire up Telegram card from config
+    var tgUrl = (window.PORTAL_CONFIG && window.PORTAL_CONFIG.telegramInviteUrl) || '';
+    var tgCard = document.getElementById('confirmTelegramCard');
+    if (tgCard) tgCard.style.display = tgUrl ? '' : 'none';
+    var tgLink = document.getElementById('confirmTelegramLink');
+    if (tgLink && tgUrl) tgLink.href = tgUrl;
     window.scrollTo(0, 0);
   }
 
@@ -330,7 +336,7 @@
       });
 
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit'; }
-      showPostSubmission();
+      showOnboarding();
     } catch (err) {
       console.error('Portal submit error:', err);
       var msg = err && err.message ? err.message : 'Network error. Try again.';

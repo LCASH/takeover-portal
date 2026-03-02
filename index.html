@@ -149,6 +149,28 @@
     .screen.onboarding-active .form-wrap {
       display: none;
     }
+
+    /* Post-submission screen — override absolute centering, make it a scrollable card panel */
+    .screen.confirm-active .center-wrapper,
+    .screen.confirm-active .center-block,
+    .screen.confirm-active .form-wrap,
+    .screen.confirm-active .terminal {
+      display: none !important;
+    }
+
+    #confirmMsg {
+      position: static !important;
+      transform: none !important;
+      left: auto !important;
+      top: auto !important;
+      text-align: left !important;
+      max-width: 42rem;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+      font-size: inherit;
+      color: inherit;
+    }
   </style>
 </head>
 
@@ -393,34 +415,41 @@
 
     <!-- Post-submit message -->
     <div class="confirm-msg" id="confirmMsg" hidden>
-      <div style="max-width: 28rem; margin: 0 auto; text-align: center; padding: 2rem 1rem;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
-        <h2 style="font-size: 1.5rem; font-weight: 600; color: #0f172a; margin-bottom: 0.75rem;">Thanks for joining!
-        </h2>
-        <p style="color: #475569; line-height: 1.6; margin-bottom: 1.25rem;">
-          We've sent your login details to your mobile. You can log in anytime to update your details.
-        </p>
-        <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem;">
-          We'll review your application and reach out within <strong style="color: #334155;">24 hours</strong>.
-        </p>
-        <a id="telegramJoinBtn" href="#" target="_blank" rel="noopener"
-          style="display: inline-flex; align-items: center; gap: 0.5rem; background: #0088cc; color: #fff; text-decoration: none; padding: 0.875rem 2rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.95rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,136,204,0.3);"
-          onmouseover="this.style.background='#006da3';this.style.transform='translateY(-1px)'"
-          onmouseout="this.style.background='#0088cc';this.style.transform='none'">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+      <!-- Thank you card -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6">
+        <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mb-6">
+          <svg class="w-7 h-7 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
-          Join the Telegram Group
+        </div>
+        <h1 class="text-2xl font-semibold text-slate-900 tracking-tight mb-3">Application submitted</h1>
+        <p class="text-slate-600 text-base leading-relaxed mb-3">Thanks for completing your application. We'll review
+          your details and be in touch within 24 hours to approve your account.</p>
+        <p class="text-slate-400 text-sm leading-relaxed">Once approved, you'll receive an SMS with your login details.
+          You can log in at any time to update your information.</p>
+      </div>
+      <!-- Telegram CTA -->
+      <div id="confirmTelegramCard"
+        class="rounded-xl border border-slate-200 bg-white p-6 mb-6 hover:border-blue-500 transition-colors shadow-sm">
+        <a id="confirmTelegramLink" href="#" target="_blank" rel="noopener" class="block group">
+          <div class="flex items-center gap-5">
+            <div
+              class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-500/20 transition-colors">
+              <svg class="w-6 h-6 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M11.944 0A12 12 0 1 0 24 12.056A12.014 12.014 0 0 0 11.944 0Zm5.654 8.22l-1.636 7.706c-.12.54-.44.67-.9.42l-2.48-1.828-1.2 1.152a.627.627 0 0 1-.5.244l.18-2.508 4.56-4.12c.2-.176-.044-.274-.308-.098l-5.64 3.552-2.428-.756c-.528-.166-.54-.528.11-.782l9.484-3.656c.44-.16.824.108.68.782Z" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">Join our Community</p>
+              <p class="text-sm text-slate-500 mt-0.5">Connect with other members in the official support channel.</p>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors flex-shrink-0" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </a>
-        <script>
-          (function() {
-            var btn = document.getElementById('telegramJoinBtn');
-            var tgUrl = (window.PORTAL_CONFIG && window.PORTAL_CONFIG.telegramInviteUrl) || '';
-            if (btn && tgUrl) { btn.href = tgUrl; }
-            else if (btn) { btn.style.display = 'none'; }
-          })();
-        </script>
       </div>
     </div>
   </div>
