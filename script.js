@@ -336,6 +336,25 @@
       });
 
       if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit'; }
+
+      // Send welcome SMS with community link
+      var tgUrl = (window.PORTAL_CONFIG && window.PORTAL_CONFIG.telegramInviteUrl) || '';
+      fetch(supabaseUrl + '/functions/v1/send-portal-sms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseAnonKey,
+        },
+        body: JSON.stringify({
+          bowler_id: currentBowlerId,
+          first_name: firstName,
+          mobile: mobile,
+          telegram_url: tgUrl || undefined,
+        }),
+      }).catch(function (err) {
+        console.error('SMS send error (non-blocking):', err);
+      });
+
       showOnboarding();
     } catch (err) {
       console.error('Portal submit error:', err);

@@ -1,6 +1,6 @@
 // Portal SMS via Twilio. Twilio from env TWILIO_* or from bowler's org (organizations.settings.twilio).
-// Body: { bowler_id?, first_name, mobile, organization_id? }. Updates bowlers.landing_sms_sent_at / landing_sms_error.
-// Note: No longer called by the landing page (video verification removed). Kept for manual/admin use.
+// Body: { bowler_id?, first_name, mobile, telegram_url? }. Updates bowlers.landing_sms_sent_at / landing_sms_error.
+// Called after Step 1 (expression of interest) to welcome user and share community link.
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -12,6 +12,7 @@ interface Body {
   bowler_id?: string;
   first_name: string;
   mobile: string;
+  telegram_url?: string;
 }
 
 const ENV_ALIASES: Record<string, string[]> = {
@@ -62,7 +63,7 @@ serve(async (req) => {
   try {
     const body = (await req.json()) as Body;
     bowler_id = typeof body.bowler_id === 'string' ? body.bowler_id : undefined;
-    const { first_name, mobile } = body;
+    const { first_name, mobile, telegram_url } = body;
     if (!first_name || !mobile) {
       return new Response(JSON.stringify({ error: 'first_name and mobile required' }), { status: 400, headers: cors });
     }
@@ -75,8 +76,9 @@ serve(async (req) => {
     const twilio = await getTwilioConfig(admin, bowler_id);
     const { accountSid, authToken, fromNumber } = twilio;
     const to = mobile.startsWith('+') ? mobile : '+' + mobile.replace(/\D/g, '');
-    const smsBody =
-      `Hey ${first_name}, thanks for signing up! We're reviewing your application and will be in touch soon.`;
+    const smsBody = telegram_url
+      ? `Hey ${first_name}, thanks for signing up! You can reach out here if you have questions about how we use your betting account or chat with our community here: ${telegram_url}`
+      : `Hey ${first_name}, thanks for signing up! We're reviewing your application and will be in touch soon.`;
     const url = `${TWILIO_URL}/${accountSid}/Messages.json`;
     const params = new URLSearchParams({ To: to, From: fromNumber, Body: smsBody });
     const res = await fetch(url, {
