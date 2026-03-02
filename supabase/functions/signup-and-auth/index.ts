@@ -6,7 +6,11 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const cors = { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' };
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 function generatePassword(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
@@ -29,22 +33,35 @@ interface Body {
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*' } });
-  if (req.method !== 'POST') return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: cors });
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 
   try {
     const body = (await req.json()) as Body;
     const { full_name, first_name, last_name, email, mobile, referrer, country, organization_id } = body;
 
     if (!full_name || !first_name || !email || !mobile || !country) {
-      return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: cors });
+      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
     if (!supabaseUrl || !serviceRoleKey || !anonKey) {
-      return new Response(JSON.stringify({ error: 'Server not configured' }), { status: 500, headers: cors });
+      return new Response(JSON.stringify({ error: 'Server not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -66,7 +83,7 @@ serve(async (req) => {
       const isUnique = insertErr.code === '23505' || (insertErr.message && insertErr.message.includes('unique'));
       return new Response(
         JSON.stringify({ error: isUnique ? 'This email or phone is already registered.' : insertErr.message }),
-        { status: isUnique ? 409 : 400, headers: cors }
+        { status: isUnique ? 409 : 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -83,7 +100,10 @@ serve(async (req) => {
     if (createErr) {
       // Clean up the bowler row if auth user creation fails
       await admin.from('bowlers').delete().eq('id', bowlerId);
-      return new Response(JSON.stringify({ error: createErr.message }), { status: 400, headers: cors });
+      return new Response(JSON.stringify({ error: createErr.message }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const authUserId = userData.user.id;
@@ -92,11 +112,14 @@ serve(async (req) => {
     // NOTE: login_enabled_at is NOT set — that happens when admin approves
     const { error: updateErr } = await admin.from('bowlers').update({
       auth_user_id: authUserId,
-      encrypted_password: password, // TODO: encrypt with pgp_sym_encrypt if pgcrypto available
+      encrypted_password: password,
     }).eq('id', bowlerId);
 
     if (updateErr) {
-      return new Response(JSON.stringify({ error: updateErr.message }), { status: 500, headers: cors });
+      return new Response(JSON.stringify({ error: updateErr.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // 4. Sign in as the user to get session tokens
@@ -109,16 +132,25 @@ serve(async (req) => {
     });
 
     if (signInErr) {
-      return new Response(JSON.stringify({ error: 'Account created but sign-in failed: ' + signInErr.message }), { status: 500, headers: cors });
+      return new Response(JSON.stringify({ error: 'Account created but sign-in failed: ' + signInErr.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     return new Response(JSON.stringify({
       bowler_id: bowlerId,
       access_token: signInData.session!.access_token,
       refresh_token: signInData.session!.refresh_token,
-    }), { status: 200, headers: cors });
+    }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: cors });
+    return new Response(JSON.stringify({ error: String(e) }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
