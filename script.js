@@ -322,12 +322,12 @@
 
       currentBowlerId = result.bowler_id;
 
-      // Create authenticated client with session (persisted in sessionStorage for page refresh survival)
+      // Create authenticated client with session (persisted in localStorage for browser close survival)
       authClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
         auth: {
           persistSession: true,
           autoRefreshToken: true,
-          storage: window.sessionStorage,
+          storage: window.localStorage,
         },
       });
       await authClient.auth.setSession({
@@ -487,11 +487,56 @@
     }
   }
 
+  // --- Session resume: check for existing auth session on page load ---
+  async function tryResumeSession() {
+    if (!supabaseUrl || !supabaseAnonKey) return false;
+    try {
+      var resumeClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+        auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage },
+      });
+      var sessionResult = await resumeClient.auth.getSession();
+      var session = sessionResult && sessionResult.data && sessionResult.data.session;
+      if (!session || !session.user) return false;
+
+      // Session exists — check if form is already completed
+      var bowlerResult = await resumeClient.from('bowlers')
+        .select('id, required_form_completed_at')
+        .eq('auth_user_id', session.user.id)
+        .maybeSingle();
+
+      var bowler = bowlerResult && bowlerResult.data;
+      if (!bowler) return false;
+
+      if (bowler.required_form_completed_at) {
+        // Form already completed — show confirmation screen
+        authClient = resumeClient;
+        currentBowlerId = bowler.id;
+        showPostSubmission();
+        return true;
+      }
+
+      // Form not completed — resume at Step 2
+      authClient = resumeClient;
+      currentBowlerId = bowler.id;
+      showOnboarding();
+      return true;
+    } catch (err) {
+      console.warn('Session resume failed:', err);
+      // Clear stale session data
+      try { window.localStorage.removeItem('sb-' + supabaseUrl.split('//')[1]?.split('.')[0] + '-auth-token'); } catch (_) {}
+      return false;
+    }
+  }
+
   // --- Event listeners ---
   joinBtn.addEventListener('click', onJoinClick);
   portalForm.addEventListener('submit', onFormSubmit);
   onboardingForm.addEventListener('submit', onOnboardingSubmit);
 
-  // Start eye sequence
-  setTimeout(startEyeSequence, 400);
+  // Check for existing session first, otherwise start normal flow
+  tryResumeSession().then(function (resumed) {
+    if (!resumed) {
+      setTimeout(startEyeSequence, 400);
+    }
+  });
 })();
