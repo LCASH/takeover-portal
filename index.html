@@ -298,36 +298,52 @@
           <div class="banks-list" id="banksList"></div>
         </section>
 
-        <!-- Identity verification -->
+        <!-- Identity verification — provide 2 of 3 document types -->
         <section class="space-y-6 pt-6 border-t border-slate-200">
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">Identity Verification
               <span class="text-blue-500">*</span></label>
-            <p class="text-[11px] text-slate-500 mb-3">Please upload a clear, legible selfie ID to verify your identity.
-            </p>
-            <div class="upload-zone rounded-xl p-8 text-center" id="selfieZone"
-              data-placeholder="Choose file or drag here">
-              <span class="upload-text text-sm text-slate-500">Choose file or drag here</span>
-            </div>
-            <input type="file" id="selfieInput" accept="image/*,.pdf" class="hidden" />
+            <p class="text-sm text-slate-500 mb-1">Please provide <strong class="text-slate-700">at least 2 of the 3</strong> document types below. All documents must be current (not expired).</p>
+            <p id="idDocCount" class="text-xs text-slate-400 mb-4">0 of 3 provided — need at least 2</p>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">ID Front <span
-                  class="text-blue-500">*</span></label>
-              <div class="upload-zone rounded-xl p-6 text-center" id="licenseFrontZone" data-placeholder="Upload front">
-                <span class="upload-text text-sm text-slate-500">Upload front</span>
+
+          <!-- 1. Driver's Licence (front + back) -->
+          <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-4">
+            <p class="text-sm font-semibold text-slate-700">1. Driver's Licence <span class="text-xs font-normal text-slate-400">(front &amp; back)</span></p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">Front</label>
+                <div class="upload-zone rounded-lg p-5 text-center" id="licenseFrontZone" data-placeholder="Upload front">
+                  <span class="upload-text text-sm text-slate-500">Upload front</span>
+                </div>
+                <input type="file" id="licenseFrontInput" accept="image/*,.pdf" class="hidden" />
               </div>
-              <input type="file" id="licenseFrontInput" accept="image/*,.pdf" class="hidden" />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold uppercase text-slate-500 mb-2 tracking-wide">ID Back <span
-                  class="text-blue-500">*</span></label>
-              <div class="upload-zone rounded-xl p-6 text-center" id="licenseBackZone" data-placeholder="Upload back">
-                <span class="upload-text text-sm text-slate-500">Upload back</span>
+              <div>
+                <label class="block text-xs text-slate-500 mb-1">Back</label>
+                <div class="upload-zone rounded-lg p-5 text-center" id="licenseBackZone" data-placeholder="Upload back">
+                  <span class="upload-text text-sm text-slate-500">Upload back</span>
+                </div>
+                <input type="file" id="licenseBackInput" accept="image/*,.pdf" class="hidden" />
               </div>
-              <input type="file" id="licenseBackInput" accept="image/*,.pdf" class="hidden" />
             </div>
+          </div>
+
+          <!-- 2. Medicare Card -->
+          <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-3">
+            <p class="text-sm font-semibold text-slate-700">2. Medicare Card</p>
+            <div class="upload-zone rounded-lg p-5 text-center" id="medicareZone" data-placeholder="Upload Medicare card">
+              <span class="upload-text text-sm text-slate-500">Upload Medicare card</span>
+            </div>
+            <input type="file" id="medicareInput" accept="image/*,.pdf" class="hidden" />
+          </div>
+
+          <!-- 3. Passport -->
+          <div class="p-4 bg-white border border-slate-200 rounded-xl space-y-3">
+            <p class="text-sm font-semibold text-slate-700">3. Passport</p>
+            <div class="upload-zone rounded-lg p-5 text-center" id="passportZone" data-placeholder="Upload passport photo page">
+              <span class="upload-text text-sm text-slate-500">Upload passport photo page</span>
+            </div>
+            <input type="file" id="passportInput" accept="image/*,.pdf" class="hidden" />
           </div>
         </section>
 
@@ -386,8 +402,18 @@
           </div>
         </section>
 
+        <!-- Cooperation notice -->
+        <section class="pt-6 border-t border-slate-200">
+          <div class="p-4 bg-amber-50 border-l-4 border-amber-400 rounded-r shadow-sm text-sm text-slate-700 leading-relaxed">
+            <p class="font-semibold text-slate-900 mb-2">Cooperation & Payment Terms</p>
+            <p class="mb-2">You will be paid <strong class="text-slate-900">$25 per week</strong> while your accounts are active. To keep receiving payments you must cooperate with account setup and ongoing management.</p>
+            <p class="mb-2">This includes setting up accounts if asked (rarely happens) — it's easy and takes very little time — providing accurate documents, and responding to requests promptly.</p>
+            <p>If you stop cooperating, payments will be paused and you may be removed from the program.</p>
+          </div>
+        </section>
+
         <!-- T&Cs -->
-        <section class="space-y-4 pt-6 mt-6 border-t border-slate-200">
+        <section class="space-y-4 pt-6 mt-2 border-t border-slate-200">
           <label class="flex items-start gap-4 cursor-pointer group">
             <input type="checkbox" name="accept_betting_tcs" required class="mt-0.5" />
             <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I accept the Platform
@@ -399,9 +425,21 @@
               Provider Terms & Conditions <span class="text-blue-500">*</span></span>
           </label>
           <label class="flex items-start gap-4 cursor-pointer group">
+            <input type="checkbox" name="accept_paypal_consent" required class="mt-0.5" />
+            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I consent to a PayPal account being created and managed on my behalf <span class="text-blue-500">*</span></span>
+          </label>
+          <label class="flex items-start gap-4 cursor-pointer group">
             <input type="checkbox" name="confirm_details" required class="mt-0.5" />
             <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I confirm all provided
               details are legally mine <span class="text-blue-500">*</span></span>
+          </label>
+          <label class="flex items-start gap-4 cursor-pointer group">
+            <input type="checkbox" name="accept_cooperation" required class="mt-0.5" />
+            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I agree to the cooperation and payment terms described above <span class="text-blue-500">*</span></span>
+          </label>
+          <label class="flex items-start gap-4 cursor-pointer group">
+            <input type="checkbox" name="accept_bank_card_mail" required class="mt-0.5" />
+            <span class="text-sm text-slate-500 group-hover:text-slate-700 transition-colors">I acknowledge I will receive a bank card by mail and agree to share the details and then cut it up <span class="text-blue-500">*</span></span>
           </label>
         </section>
 
