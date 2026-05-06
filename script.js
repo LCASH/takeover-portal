@@ -199,7 +199,7 @@
   }
 
   // --- Retry wrapper (ported from portal.js) ---
-  function withRetry(fn, label) {
+  function withRetry(fn) {
     var attempts = 3;
     return function () {
       var lastErr;
@@ -263,6 +263,7 @@
     setupUpload('licenseBackZone', 'licenseBackInput');
     setupUpload('medicareZone', 'medicareInput');
     setupUpload('passportZone', 'passportInput');
+    setupUpload('selfieZone', 'selfieInput');
     setupUpload('consentVideoZone', 'consentVideoInput');
     setupIdDocCounter();
 
@@ -409,12 +410,17 @@
     var licenseBackFile = document.getElementById('licenseBackInput').files[0];
     var medicareFile = document.getElementById('medicareInput').files[0];
     var passportFile = document.getElementById('passportInput').files[0];
+    var selfieFile = document.getElementById('selfieInput').files[0];
     var consentVideoFile = document.getElementById('consentVideoInput').files[0];
 
     // Validate: at least 2 of 3 document types provided
     var docCount = countProvidedDocs();
     if (docCount < 2) {
       showOnboardingError('Please provide at least 2 of the 3 identity documents (Driver\'s Licence, Medicare Card, Passport).');
+      return;
+    }
+    if (!selfieFile) {
+      showOnboardingError('Please upload a selfie holding your ID next to your face.');
       return;
     }
     if (!consentVideoFile) {
@@ -430,7 +436,7 @@
     var MAX_VIDEO_MB = 50;
     var maxImageBytes = MAX_IMAGE_MB * 1024 * 1024;
     var maxVideoBytes = MAX_VIDEO_MB * 1024 * 1024;
-    var allImageFiles = [licenseFrontFile, licenseBackFile, medicareFile, passportFile].filter(Boolean);
+    var allImageFiles = [licenseFrontFile, licenseBackFile, medicareFile, passportFile, selfieFile].filter(Boolean);
     if (allImageFiles.some(function (f) { return f.size > maxImageBytes; })) {
       showOnboardingError('One or more ID files are too large (max ' + MAX_IMAGE_MB + 'MB each). Use smaller photos or compress them.');
       if (btn) { btn.disabled = false; btn.textContent = 'Submit Application'; }
@@ -476,6 +482,7 @@
       var licenseBackPath = licenseBackFile ? await upload(licenseBackFile, 'license_back') : null;
       var medicarePath = medicareFile ? await upload(medicareFile, 'medicare') : null;
       var passportPath = passportFile ? await upload(passportFile, 'passport') : null;
+      var selfiePath = await upload(selfieFile, 'selfie');
       var consentVideoPath = await upload(consentVideoFile, 'consent_video');
 
       var now = new Date().toISOString();
@@ -493,6 +500,7 @@
         license_back_url: licenseBackPath,
         medicare_url: medicarePath,
         passport_url: passportPath,
+        selfie_url: selfiePath,
         consent_video_url: consentVideoPath,
         accept_betting_tcs_at: now,
         accept_bank_paypal_tcs_at: now,
