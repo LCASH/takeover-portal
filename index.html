@@ -68,6 +68,22 @@
       color: #34d399;
     }
 
+    .onboarding-wrap .upload-remove {
+      display: inline-block;
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-top: 0.4rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .onboarding-wrap .upload-remove:hover {
+      color: #ef4444;
+    }
+
     .onboarding-wrap input[type="checkbox"] {
       appearance: none;
       width: 18px;
@@ -215,8 +231,16 @@
         <p id="formError" class="form-error-msg" hidden aria-live="polite"></p>
         <form class="portal-form" id="portalForm">
           <label>
-            <span>Full name</span>
-            <input type="text" name="fullname" required autocomplete="name" placeholder="As on your ID" />
+            <span>First name</span>
+            <input type="text" name="first_name" required autocomplete="given-name" placeholder="As on your ID" />
+          </label>
+          <label>
+            <span>Middle name</span>
+            <input type="text" name="middle_name" required autocomplete="additional-name" placeholder="As on your ID — type N/A if none" />
+          </label>
+          <label>
+            <span>Last name</span>
+            <input type="text" name="last_name" required autocomplete="family-name" placeholder="As on your ID" />
           </label>
           <label>
             <span>Email</span>

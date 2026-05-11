@@ -155,18 +155,91 @@
     else zone.textContent = text;
   }
 
+  // Client-side image downscale + re-encode to JPEG. Returns the original file
+  // if it's not an image, already small, or compression fails.
+  async function resizeImage(file, maxDim, quality) {
+    if (!file || !file.type || file.type.indexOf('image/') !== 0) return file;
+    if (file.type === 'image/gif') return file;
+    if (file.size < 400 * 1024) return file;
+    var url = URL.createObjectURL(file);
+    try {
+      var img = await new Promise(function (resolve, reject) {
+        var i = new Image();
+        i.onload = function () { resolve(i); };
+        i.onerror = function () { reject(new Error('image load failed')); };
+        i.src = url;
+      });
+      var w = img.naturalWidth, h = img.naturalHeight;
+      if (!w || !h) return file;
+      var scale = Math.min(1, maxDim / Math.max(w, h));
+      if (scale >= 1 && file.size < 2 * 1024 * 1024) return file;
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(w * scale));
+      canvas.height = Math.max(1, Math.round(h * scale));
+      var ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      var blob = await new Promise(function (resolve) { canvas.toBlob(resolve, 'image/jpeg', quality); });
+      if (!blob || blob.size >= file.size) return file;
+      var newName = file.name.replace(/\.[a-z0-9]+$/i, '') + '.jpg';
+      return new File([blob], newName, { type: 'image/jpeg' });
+    } catch (_) {
+      return file;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  function pickFile(idInput) {
+    var el = document.getElementById(idInput);
+    if (!el) return undefined;
+    return el._processedFile || el.files[0];
+  }
+
   function setupUpload(idZone, idInput) {
     var zone = document.getElementById(idZone);
     var input = document.getElementById(idInput);
     if (!zone || !input) return;
     var defaultText = zone.getAttribute('data-placeholder') || 'Drop files here or browse';
+
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'upload-remove';
+    removeBtn.textContent = '\u2715 Remove';
+    removeBtn.hidden = true;
+    if (zone.parentNode) zone.parentNode.insertBefore(removeBtn, zone.nextSibling);
+
     function highlight() { zone.classList.add('dragover'); }
     function unhighlight() { zone.classList.remove('dragover'); }
     function updateLabel() {
-      var name = input.files[0] && input.files[0].name;
+      var f = input._processedFile || input.files[0];
+      var name = f && f.name;
       setUploadZoneText(zone, name ? '\u2713 ' + name : defaultText);
       zone.classList.toggle('has-file', !!name);
+      removeBtn.hidden = !name;
     }
+
+    async function handleChange() {
+      var f = input.files[0];
+      if (f && f.type && f.type.indexOf('image/') === 0) {
+        setUploadZoneText(zone, 'Processing image\u2026');
+        try {
+          input._processedFile = await resizeImage(f, 1600, 0.85);
+        } catch (_) {
+          input._processedFile = f;
+        }
+      } else {
+        input._processedFile = null;
+      }
+      updateLabel();
+    }
+
+    function clearFile(e) {
+      if (e) e.preventDefault();
+      input.value = '';
+      input._processedFile = null;
+      updateLabel();
+    }
+
     zone.addEventListener('click', function () { input.click(); });
     zone.addEventListener('dragover', function (e) { e.preventDefault(); highlight(); });
     zone.addEventListener('dragleave', unhighlight);
@@ -174,9 +247,10 @@
       e.preventDefault();
       unhighlight();
       if (e.dataTransfer.files.length) input.files = e.dataTransfer.files;
-      updateLabel();
+      handleChange();
     });
-    input.addEventListener('change', updateLabel);
+    input.addEventListener('change', handleChange);
+    removeBtn.addEventListener('click', clearFile);
   }
 
   // --- Bank selection setup (ported from portal.js) ---
@@ -295,7 +369,12 @@
       submitBtn.textContent = 'Submitting…';
     }
 
-    var fullName = (portalForm.querySelector('[name="fullname"]') || {}).value || '';
+    var firstNameRaw = (portalForm.querySelector('[name="first_name"]') || {}).value || '';
+    var middleNameRaw = (portalForm.querySelector('[name="middle_name"]') || {}).value || '';
+    var lastNameRaw = (portalForm.querySelector('[name="last_name"]') || {}).value || '';
+    var middleClean = middleNameRaw.trim();
+    var middleIsNA = /^n\.?\/?a\.?$/i.test(middleClean);
+    var fullName = [firstNameRaw.trim(), middleIsNA ? '' : middleClean, lastNameRaw.trim()].filter(Boolean).join(' ');
     var email = (portalForm.querySelector('[name="email"]') || {}).value || '';
     var countryCode = (portalForm.querySelector('[name="mobile_country"]') || {}).value || '';
     var mobileNumber = (portalForm.querySelector('[name="mobile_number"]') || {}).value || '';
@@ -309,8 +388,8 @@
     }
     var referrer = (portalForm.querySelector('[name="referrer"]') || {}).value || null;
     var country = (portalForm.querySelector('[name="country"]') || {}).value || '';
-    var firstName = firstFromFullName(fullName);
-    var lastName = fullName.trim().split(/\s+/).slice(1).join(' ') || null;
+    var firstName = firstNameRaw.trim() || firstFromFullName(fullName);
+    var lastName = lastNameRaw.trim() || null;
 
     if (!anonClient) {
       showFormError('Portal is not connected to the database. Please contact support.');
@@ -406,12 +485,12 @@
       return;
     }
 
-    var licenseFrontFile = document.getElementById('licenseFrontInput').files[0];
-    var licenseBackFile = document.getElementById('licenseBackInput').files[0];
-    var medicareFile = document.getElementById('medicareInput').files[0];
-    var passportFile = document.getElementById('passportInput').files[0];
-    var selfieFile = document.getElementById('selfieInput').files[0];
-    var consentVideoFile = document.getElementById('consentVideoInput').files[0];
+    var licenseFrontFile = pickFile('licenseFrontInput');
+    var licenseBackFile = pickFile('licenseBackInput');
+    var medicareFile = pickFile('medicareInput');
+    var passportFile = pickFile('passportInput');
+    var selfieFile = pickFile('selfieInput');
+    var consentVideoFile = pickFile('consentVideoInput');
 
     // Validate: at least 2 of 3 document types provided
     var docCount = countProvidedDocs();

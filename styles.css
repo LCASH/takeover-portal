@@ -61,7 +61,7 @@ body {
 .screen {
   min-height: 100vh;
   min-height: 100dvh;
-  padding: max(1.25rem, env(safe-area-inset-top)) 1.25rem 4rem;
+  padding: calc(max(2.5rem, env(safe-area-inset-top)) + 1rem) 1.25rem 4rem;
   padding-left: max(1.25rem, env(safe-area-inset-left));
   padding-right: max(1.25rem, env(safe-area-inset-right));
   display: flex;
