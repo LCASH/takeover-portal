@@ -77,6 +77,50 @@ serve(async (req) => {
 
     const admin = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
+    // Rate limiting — defends against cost-amplification / lead-spam where a
+    // bot calls this endpoint thousands of times to create auth users + fire
+    // Twilio SMS. Reject if the same IP, mobile, or email has hit us too often
+    // in the recent past. Counts include failed attempts so brute force is
+    // also limited.
+    const fwd = req.headers.get('x-forwarded-for') || '';
+    const ip = fwd.split(',')[0].trim() || 'unknown';
+    const ua = req.headers.get('user-agent') || '';
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedMobile = mobile.replace(/\s/g, '');
+
+    type Bucket = { key: string; window_seconds: number; max: number };
+    const buckets: Bucket[] = [
+      { key: `ip:${ip}`,         window_seconds: 60,   max: 5  },  // 5/min/IP
+      { key: `ip:${ip}`,         window_seconds: 3600, max: 20 },  // 20/hour/IP
+      { key: `mobile:${normalizedMobile}`, window_seconds: 600, max: 2 },  // 2/10min/mobile
+      { key: `email:${normalizedEmail}`,   window_seconds: 600, max: 2 },  // 2/10min/email
+    ];
+
+    for (const b of buckets) {
+      const since = new Date(Date.now() - b.window_seconds * 1000).toISOString();
+      const { count } = await admin.from('signup_attempts')
+        .select('id', { count: 'exact', head: true })
+        .eq('key', b.key)
+        .gte('attempted_at', since);
+      if ((count ?? 0) >= b.max) {
+        await admin.from('signup_attempts').insert({ key: b.key, succeeded: false, user_agent: ua, ip });
+        return new Response(JSON.stringify({
+          error: 'Too many signup attempts. Please try again later.',
+          retry_after_seconds: b.window_seconds,
+        }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': String(b.window_seconds) },
+        });
+      }
+    }
+
+    // Record this attempt up front (counts even if signup ultimately fails).
+    await admin.from('signup_attempts').insert([
+      { key: `ip:${ip}`,                   succeeded: false, user_agent: ua, ip },
+      { key: `mobile:${normalizedMobile}`, succeeded: false, user_agent: ua, ip },
+      { key: `email:${normalizedEmail}`,   succeeded: false, user_agent: ua, ip },
+    ]);
+
     // 1. Create bowler record
     const { data: bowler, error: insertErr } = await admin.from('bowlers').insert({
       full_name,
