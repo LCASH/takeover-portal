@@ -93,37 +93,14 @@ serve(async (req) => {
     if (insertErr) {
       const isUnique = insertErr.code === '23505' || (insertErr.message && insertErr.message.includes('unique'));
       if (isUnique) {
-        // Returning user — look up existing bowler and re-authenticate
-        const { data: existing } = await admin.from('bowlers')
-          .select('id, auth_user_id, encrypted_password, required_form_completed_at')
-          .eq('email', email.trim().toLowerCase())
-          .maybeSingle();
-
-        if (existing && !existing.required_form_completed_at && existing.auth_user_id && existing.encrypted_password) {
-          // Form not completed — re-auth so they can resume Step 2
-          const userClient = createClient(supabaseUrl, anonKey!, {
-            auth: { autoRefreshToken: false, persistSession: false },
-          });
-          const { data: signInData, error: signInErr } = await userClient.auth.signInWithPassword({
-            email: email.trim().toLowerCase(),
-            password: existing.encrypted_password,
-          });
-          if (signInErr) {
-            return new Response(JSON.stringify({ error: 'Could not re-authenticate. Please contact support.' }), {
-              status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            });
-          }
-          return new Response(JSON.stringify({
-            bowler_id: existing.id,
-            access_token: signInData.session!.access_token,
-            refresh_token: signInData.session!.refresh_token,
-          }), {
-            status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-
+        // SECURITY: do NOT re-authenticate by stored password. Returning users
+        // must sign in via /login.html (or use the password-reset flow). The
+        // old branch handed out a session token to anyone who knew the email.
         return new Response(
-          JSON.stringify({ error: 'This email or phone is already registered.' }),
+          JSON.stringify({
+            error: 'This email or phone is already registered. Please sign in instead.',
+            already_registered: true,
+          }),
           { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -154,11 +131,13 @@ serve(async (req) => {
 
     const authUserId = userData.user.id;
 
-    // 3. Link auth user to bowler and store encrypted password
-    // NOTE: login_enabled_at is NOT set — that happens when admin approves
+    // 3. Link auth user to bowler. Do NOT store the password anywhere — the
+    // session is returned to the client below, and the password is one-time
+    // (the user resets it via /login.html → forgot password if they need to
+    // sign in again from a new device).
+    // NOTE: login_enabled_at is NOT set — that happens when admin approves.
     const { error: updateErr } = await admin.from('bowlers').update({
       auth_user_id: authUserId,
-      encrypted_password: password,
     }).eq('id', bowlerId);
 
     if (updateErr) {
