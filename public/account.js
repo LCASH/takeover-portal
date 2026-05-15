@@ -53,15 +53,21 @@
       zone.classList.toggle('has-file', !!path);
     }
     if (previewEl) {
-      if (!path) {
-        previewEl.innerHTML = '';
-        return;
-      }
+      previewEl.replaceChildren();
+      if (!path) return;
       var url = docPublicUrl(path);
       if (isImagePath(path)) {
-        previewEl.innerHTML = '<img src="' + url + '" alt="Uploaded" />';
+        var img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Uploaded';
+        previewEl.appendChild(img);
       } else {
-        previewEl.innerHTML = '<a href="' + url + '" target="_blank" rel="noopener">View document</a>';
+        var a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = 'View document';
+        previewEl.appendChild(a);
       }
     }
   }
