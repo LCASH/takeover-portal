@@ -1,0 +1,32 @@
+# Belt-and-braces: vercel.json sets outputDirectory: public, so only files under
+# public/ are served. This file additionally excludes source/dev artefacts from
+# the upload so they cannot leak through any future misconfiguration.
+
+# Source / dev
+README.md
+docs/
+supabase/
+scripts/
+apply_*.py
+config.example.js
+.env
+.env.*
+package*.json
+node_modules/
+
+# VCS / IDE
+.git/
+.github/
+.gitignore
+.vscode/
+.idea/
+
+# Plans / claude artefacts
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# One-shot helper scripts at repo root
+test-*.mjs
