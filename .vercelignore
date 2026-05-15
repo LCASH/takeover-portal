@@ -1,25 +1,26 @@
-# Belt-and-braces: vercel.json sets outputDirectory: public, so only files under
-# public/ are served. This file additionally excludes source/dev artefacts from
-# the upload so they cannot leak through any future misconfiguration.
+# Belt-and-braces: vercel.json sets outputDirectory: "public", so only files
+# under public/ are served. This file additionally trims the upload so source
+# and dev artefacts cannot leak through any future misconfiguration.
+#
+# Do NOT ignore package.json, package-lock.json, or scripts/ — Vercel needs
+# them at the build root to install deps and run scripts/write-config.js.
 
-# Source / dev
+# Source / dev (not needed at build time, must never ship)
 README.md
 docs/
 supabase/
-scripts/
 apply_*.py
 config.example.js
+
+# Env (Vercel injects vars from project settings)
 .env
-.env.*
-package*.json
-node_modules/
+.env.local
+.env.production
+.env.*.local
+.env.example
 
 # VCS / IDE
-.git/
 .github/
-.gitignore
-.vscode/
-.idea/
 
 # Plans / claude artefacts
 .claude/
