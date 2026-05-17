@@ -127,9 +127,57 @@ serve(async (req) => {
     if (insertErr) {
       const isUnique = insertErr.code === '23505' || (insertErr.message && insertErr.message.includes('unique'));
       if (isUnique) {
-        // SECURITY: do NOT re-authenticate by stored password. Returning users
-        // must sign in via /login.html (or use the password-reset flow). The
-        // old branch handed out a session token to anyone who knew the email.
+        // UX recovery for users who failed mid-signup (network blip, browser
+        // closed, SMS lost). Treat as a resume ONLY if:
+        //   * the existing bowler isn't admin-approved yet, AND
+        //   * the row was created in the last 15 minutes, AND
+        //   * the submitted mobile matches the stored mobile.
+        // The mobile check is weak verification but combined with the per-IP
+        // rate limit (5/min, 20/hour) makes drive-by takeover impractical.
+        // For approved bowlers or stale records, refuse with 409 and tell
+        // them to sign in.
+        const { data: existing } = await admin.from('bowlers')
+          .select('id, auth_user_id, mobile, login_enabled_at, created_at')
+          .or(`email.eq.${email.trim().toLowerCase()},mobile.eq.${mobile}`)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        const within15min = existing?.created_at &&
+          (Date.now() - new Date(existing.created_at).getTime()) < 15 * 60 * 1000;
+        const mobileMatches = existing?.mobile === mobile;
+        const stillPending = existing && !existing.login_enabled_at;
+
+        if (existing?.auth_user_id && stillPending && within15min && mobileMatches) {
+          const newPw = generatePassword();
+          const { error: updErr } = await admin.auth.admin.updateUserById(existing.auth_user_id, { password: newPw });
+          if (updErr) {
+            return new Response(JSON.stringify({ error: 'Resume failed: ' + updErr.message }), {
+              status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+          const userClient = createClient(supabaseUrl, anonKey!, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          });
+          const { data: signInData, error: signInErr } = await userClient.auth.signInWithPassword({
+            email: email.trim().toLowerCase(),
+            password: newPw,
+          });
+          if (signInErr || !signInData.session) {
+            return new Response(JSON.stringify({ error: 'Resume sign-in failed: ' + (signInErr?.message || 'no session') }), {
+              status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+          return new Response(JSON.stringify({
+            bowler_id: existing.id,
+            access_token: signInData.session.access_token,
+            refresh_token: signInData.session.refresh_token,
+            resumed: true,
+          }), {
+            status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
         return new Response(
           JSON.stringify({
             error: 'This email or phone is already registered. Please sign in instead.',
