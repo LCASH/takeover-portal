@@ -62,9 +62,36 @@ for t in \
   va_sessions \
   tags \
   promo_logs \
-  edge_reactions
+  edge_reactions \
+  two_up_opportunities \
+  two_up_fetch_log \
+  grocery_items \
+  grocery_purchases \
+  bowler_payment_notifications \
+  external_referrers
 do
   check_table_anon_empty "$t"
+done
+
+echo ""
+echo "=== Edge functions that must reject anon (expect 401/403/missing-auth) ==="
+for fn in \
+  twilio-test-creds \
+  get-embedding \
+  embed-knowledge \
+  meal-prep-price-lookup \
+  fetch-2up-opportunities
+do
+  code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$SUPABASE_URL/functions/v1/$fn" \
+    -H "apikey: $SUPABASE_ANON_KEY" \
+    -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+    -H "Content-Type: application/json" -d '{}' -m 10)
+  if [[ "$code" == "200" ]]; then
+    printf '%-30s FAIL (anon got HTTP 200 — auth gate is gone)\n' "$fn"
+    fail=1
+  else
+    printf '%-30s OK   (HTTP %s)\n' "$fn" "$code"
+  fi
 done
 
 if [[ -n "${PORTAL_BASE_URL:-}" ]]; then
