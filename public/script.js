@@ -423,7 +423,15 @@
       try { result = JSON.parse(responseText); } catch (_) { result = {}; }
 
       if (!response.ok) {
-        var errMsg = result.error || 'Submission failed. Try again.';
+        var errMsg;
+        if (response.status === 409 && result && result.already_registered) {
+          errMsg = 'This email or phone is already registered. Please sign in instead — open the login page from the link below.';
+        } else if (response.status === 429) {
+          var wait = result && result.retry_after_seconds ? Math.ceil(result.retry_after_seconds / 60) : 10;
+          errMsg = 'Too many attempts. Please wait ' + wait + ' minute(s) and try again.';
+        } else {
+          errMsg = (result && result.error) || 'Submission failed. Try again.';
+        }
         showFormError(errMsg);
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit'; }
         return;
