@@ -1,0 +1,37 @@
+name: Security smoke
+
+# Runs the anon-readability + source-exposure probe on a 15-minute cron,
+# from GitHub-hosted runners (so it's platform-agnostic — works whether
+# the team is on Mac, Windows, or Linux). On any regression the workflow
+# run goes red and GitHub emails the repo admins (configurable in
+# Settings → Notifications).
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   SUPABASE_URL        e.g. https://mqikfwwbrrqkcrwrsfyg.supabase.co
+#   SUPABASE_ANON_KEY   public anon key (same one in config.build.js)
+#   PORTAL_BASE_URL     e.g. https://your-portal.vercel.app
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+  push:
+    paths:
+      - 'scripts/security-smoke.sh'
+      - '.github/workflows/security-smoke.yml'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run smoke
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          PORTAL_BASE_URL: ${{ secrets.PORTAL_BASE_URL }}
+        run: |
+          chmod +x scripts/security-smoke.sh
+          ./scripts/security-smoke.sh

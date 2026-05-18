@@ -114,8 +114,9 @@ if [[ -n "${PORTAL_BASE_URL:-}" ]]; then
     apply_html_light_theme.py
   do
     code=$(curl -s -o /dev/null -w '%{http_code}' "$PORTAL_BASE_URL/$p")
-    if [[ "$code" == "404" ]]; then
-      printf '%-65s OK   (404)\n' "$p"
+    # 404 = path not found (ideal). 403 = blocked by Vercel/WAF (also acceptable).
+    if [[ "$code" == "404" || "$code" == "403" ]]; then
+      printf '%-65s OK   (HTTP %s)\n' "$p" "$code"
     else
       printf '%-65s FAIL (HTTP %s)\n' "$p" "$code"
       fail=1
