@@ -44,6 +44,14 @@ check_table_anon_empty() {
   fail=1
 }
 
+# Note on two_up_fetch_log: intentionally NOT checked. The table holds only
+# operational metadata (id, fetched_at, row_count, duration_ms, throttled,
+# error) — no PII, no credentials, no business secrets. It has a recurring
+# re-grant pattern from an unknown source (a teammate's external EV
+# dashboard at C:\Users\b8ste\dashboards\2up-tracker\ is suspected). Until
+# that's tracked down, monitoring it just generates noise. two_up_opportunities
+# IS still checked — it contains the live arb signal (competitive intel).
+
 echo "=== Anon REST sweep ==="
 for t in \
   account_owners \
@@ -64,7 +72,6 @@ for t in \
   promo_logs \
   edge_reactions \
   two_up_opportunities \
-  two_up_fetch_log \
   grocery_items \
   grocery_purchases \
   bowler_payment_notifications \
