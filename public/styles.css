@@ -327,14 +327,16 @@ body {
   border-radius: 50%;
 }
 
-/* --- Form --- */
+/* --- Form ---
+   In-flow within the .screen flex column so the page can grow tall and
+   scroll if the form overflows the viewport. margin-block: auto lets it
+   center vertically when there's room, then collapses cleanly so the
+   Submit button is always reachable on phones. */
 .form-wrap {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
   width: 100%;
   max-width: 420px;
+  margin-inline: auto;
+  margin-block: auto;
   padding: 0 1.25rem;
 }
 
@@ -567,16 +569,20 @@ body {
 /* Animations removed in favor of direct state classes. */
 
 
-/* --- Hide elements used for layout swap --- */
+/* --- Hide elements used for layout swap ---
+   display:none rather than visibility:hidden so the hidden elements
+   collapse fully and the active element flows into their place. With
+   visibility:hidden they keep their layout space and push the active
+   panel off-screen on short viewports (phones). */
 .screen.form-active .terminal,
 .screen.form-active .center-wrapper,
 .screen.form-active .center-block {
-  visibility: hidden;
+  display: none;
 }
 
 .screen.confirm-active .terminal,
 .screen.confirm-active .center-wrapper,
 .screen.confirm-active .center-block,
 .screen.confirm-active .form-wrap {
-  visibility: hidden;
+  display: none;
 }
