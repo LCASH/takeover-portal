@@ -155,35 +155,51 @@
     else zone.textContent = text;
   }
 
-  // Client-side image downscale + re-encode to JPEG. Returns the original file
-  // if it's not an image, already small, or compression fails.
+  // Storage bucket accepts only these image MIMEs. iPhone HEIC/HEIF photos get
+  // rejected at upload otherwise.
+  var ALLOWED_IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
+
+  // Client-side image downscale + re-encode to JPEG. Also forces conversion
+  // for any non-allowed image format (HEIC/HEIF/AVIF/BMP/TIFF) regardless
+  // of size, since the bucket would reject them otherwise.
   async function resizeImage(file, maxDim, quality) {
     if (!file || !file.type || file.type.indexOf('image/') !== 0) return file;
     if (file.type === 'image/gif') return file;
-    if (file.size < 400 * 1024) return file;
+    var mustConvert = ALLOWED_IMAGE_MIMES.indexOf(file.type) === -1;
+    // For allowed formats, skip work on already-small files; for HEIC etc
+    // we must convert regardless.
+    if (!mustConvert && file.size < 400 * 1024) return file;
     var url = URL.createObjectURL(file);
     try {
       var img = await new Promise(function (resolve, reject) {
         var i = new Image();
         i.onload = function () { resolve(i); };
-        i.onerror = function () { reject(new Error('image load failed')); };
+        i.onerror = function () { reject(new Error('image_decode_failed')); };
         i.src = url;
       });
       var w = img.naturalWidth, h = img.naturalHeight;
-      if (!w || !h) return file;
+      if (!w || !h) {
+        if (mustConvert) throw new Error('image_decode_failed');
+        return file;
+      }
       var scale = Math.min(1, maxDim / Math.max(w, h));
-      if (scale >= 1 && file.size < 2 * 1024 * 1024) return file;
+      // Only the "no resize needed" short-circuit can apply to allowed formats.
+      if (!mustConvert && scale >= 1 && file.size < 2 * 1024 * 1024) return file;
       var canvas = document.createElement('canvas');
       canvas.width = Math.max(1, Math.round(w * scale));
       canvas.height = Math.max(1, Math.round(h * scale));
       var ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       var blob = await new Promise(function (resolve) { canvas.toBlob(resolve, 'image/jpeg', quality); });
-      if (!blob || blob.size >= file.size) return file;
+      if (!blob) {
+        if (mustConvert) throw new Error('image_decode_failed');
+        return file;
+      }
+      // For allowed formats, only return the new file if it's actually smaller.
+      // For unsupported formats, always return the converted file.
+      if (!mustConvert && blob.size >= file.size) return file;
       var newName = file.name.replace(/\.[a-z0-9]+$/i, '') + '.jpg';
       return new File([blob], newName, { type: 'image/jpeg' });
-    } catch (_) {
-      return file;
     } finally {
       URL.revokeObjectURL(url);
     }
@@ -554,9 +570,25 @@
 
     try {
       var upload = async function (file, pathSuffix) {
-        var path = prefix + pathSuffix + '.' + ext(file);
+        // Normalise images so iPhone HEIC/HEIF photos don't get rejected by
+        // the bucket's MIME allowlist. Videos and PDFs pass through unchanged.
+        var normalised = file;
+        if (file && file.type && file.type.indexOf('image/') === 0) {
+          try {
+            normalised = await resizeImage(file, 2400, 0.85);
+          } catch (convErr) {
+            var err = new Error(
+              'Your photo is in a format we can\'t accept (HEIC/HEIF). On iPhone: ' +
+              'Settings → Camera → Formats → choose "Most Compatible", then re-take the photo. ' +
+              'Or convert it to JPG before uploading.'
+            );
+            err.code = 'image_format';
+            throw err;
+          }
+        }
+        var path = prefix + pathSuffix + '.' + ext(normalised);
         var doUpload = function () {
-          return authClient.storage.from(BUCKET).upload(path, file, { upsert: true }).then(function (_ref) {
+          return authClient.storage.from(BUCKET).upload(path, normalised, { upsert: true }).then(function (_ref) {
             var error = _ref.error;
             if (error) throw error;
             return path;
@@ -611,9 +643,21 @@
 
       showPostSubmission();
     } catch (err) {
+      console.error('[portal] onboarding submit failed:', err);
+      var msg = err && (err.message || err.error_description || err.error) || '';
       var friendly = 'Connection or server issue — nothing was saved yet. Your form is still here. Try again (e.g. on Wi‑Fi or with smaller photos).';
-      if (err && err.message && /size|large|quota/i.test(err.message)) {
+      if (err && err.code === 'image_format') {
+        friendly = msg;
+      } else if (/mime|content[- ]type|invalid.*type/i.test(msg)) {
+        friendly = 'One of your uploads is in a format we can\'t accept. iPhone HEIC/HEIF photos are the usual cause — switch your camera to Most Compatible (Settings → Camera → Formats) or convert the photo to JPG, then try again.';
+      } else if (/size|large|quota|too big/i.test(msg)) {
         friendly = 'File too large or quota exceeded. Use smaller files and try again.';
+      } else if (/network|fetch|timeout|aborted|failed to fetch/i.test(msg)) {
+        friendly = 'Network problem — your photos didn\'t finish uploading. Try again on Wi-Fi.';
+      } else if (/row-level security|permission denied|42501/i.test(msg)) {
+        friendly = 'We couldn\'t save this submission. Please refresh and try once more — if it still fails, contact support.';
+      } else if (msg) {
+        friendly = 'Submission failed: ' + msg.slice(0, 200);
       }
       showOnboardingError(friendly);
       if (btn) { btn.disabled = false; btn.textContent = 'Submit Application'; }
