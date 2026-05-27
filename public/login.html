@@ -113,6 +113,26 @@
           <a href="index.html" class="text-xs text-slate-500 hover:text-blue-600 transition-colors">Return to home</a>
         </div>
       </form>
+
+      <div class="flex items-center gap-3 mt-8 mb-6" aria-hidden="true">
+        <div class="flex-1 h-px bg-slate-200"></div>
+        <span class="text-xs text-slate-400 uppercase tracking-wider">or</span>
+        <div class="flex-1 h-px bg-slate-200"></div>
+      </div>
+
+      <section aria-labelledby="resumeHeading">
+        <h3 id="resumeHeading" class="text-sm font-medium text-slate-900 mb-1">Started your application?</h3>
+        <p class="text-xs text-slate-500 mb-4">If you completed Step 1 but lost your session, enter the email you signed up with and we'll send you a one-time sign-in link to continue.</p>
+        <form id="resumeForm" class="space-y-3">
+          <input type="email" name="resume_email" required autocomplete="email" placeholder="name@domain.com"
+            class="w-full input-field rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-blue-500" />
+          <button type="submit" id="resumeBtn"
+            class="w-full py-3 rounded-lg text-sm border border-slate-300 text-slate-700 hover:bg-slate-100 hover:border-slate-400 transition-colors">
+            Send me a sign-in link
+          </button>
+        </form>
+        <p id="resumeMsg" class="text-sm mt-3" hidden></p>
+      </section>
     </div>
     <p class="text-center mt-8 text-xs text-slate-400">Secure Access Portal &copy; 2026</p>
   </div>

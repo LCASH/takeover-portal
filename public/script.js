@@ -441,7 +441,7 @@
       if (!response.ok) {
         var errMsg;
         if (response.status === 409 && result && result.already_registered) {
-          errMsg = 'This email or phone is already registered. Please sign in instead — open the login page from the link below.';
+          errMsg = 'This email or phone is already registered. If you started but didn\'t finish, go to the login page and use "Send me a sign-in link" to continue where you left off: ' + window.location.origin + '/login.html';
         } else if (response.status === 429) {
           var wait = result && result.retry_after_seconds ? Math.ceil(result.retry_after_seconds / 60) : 10;
           errMsg = 'Too many attempts. Please wait ' + wait + ' minute(s) and try again.';

@@ -23,6 +23,60 @@
     errorEl.hidden = false;
   }
 
+  // --- Magic-link "Resume my application" flow ---
+  // Sends a Supabase Auth OTP email. The user clicks the link, lands back on
+  // index.html with auth tokens in the URL fragment; script.js's
+  // tryResumeSession() then picks up the session and jumps to Step 2.
+  var resumeForm = document.getElementById('resumeForm');
+  var resumeMsg = document.getElementById('resumeMsg');
+  var resumeBtn = document.getElementById('resumeBtn');
+  if (resumeForm) {
+    resumeForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (resumeMsg) { resumeMsg.hidden = true; resumeMsg.textContent = ''; resumeMsg.className = 'text-sm mt-3'; }
+      var emailInput = resumeForm.querySelector('[name="resume_email"]');
+      var email = (emailInput && emailInput.value || '').trim().toLowerCase();
+      if (!email) return;
+      if (resumeBtn) { resumeBtn.disabled = true; resumeBtn.textContent = 'Sending…'; }
+      try {
+        var redirectTo = window.location.origin + '/';
+        var result = await supabase.auth.signInWithOtp({
+          email: email,
+          options: { emailRedirectTo: redirectTo, shouldCreateUser: false },
+        });
+        if (result.error) {
+          if (resumeMsg) {
+            resumeMsg.hidden = false;
+            resumeMsg.className = 'text-sm mt-3 text-red-600';
+            // Common cause: shouldCreateUser:false + email not in auth.users.
+            // Supabase returns "Signups not allowed for otp" — translate that.
+            var msg = result.error.message || '';
+            if (/signups not allowed/i.test(msg) || /not allowed for otp/i.test(msg)) {
+              resumeMsg.textContent = 'We can\'t find an application with that email. Double-check the address you used at sign-up, or use the form at the home page to start over.';
+            } else {
+              resumeMsg.textContent = 'Could not send link: ' + msg;
+            }
+          }
+        } else {
+          if (resumeMsg) {
+            resumeMsg.hidden = false;
+            resumeMsg.className = 'text-sm mt-3 text-emerald-600';
+            resumeMsg.textContent = 'Check your inbox — a sign-in link has been sent to ' + email + '. Open it on the device you want to finish on. The link is single-use and expires in 1 hour.';
+          }
+          resumeForm.reset();
+        }
+      } catch (err) {
+        if (resumeMsg) {
+          resumeMsg.hidden = false;
+          resumeMsg.className = 'text-sm mt-3 text-red-600';
+          resumeMsg.textContent = (err && err.message) || 'Something went wrong sending the link. Try again.';
+        }
+      } finally {
+        if (resumeBtn) { resumeBtn.disabled = false; resumeBtn.textContent = 'Send me a sign-in link'; }
+      }
+    });
+  }
+
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
     errorEl.hidden = true;
